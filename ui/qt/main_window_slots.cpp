@@ -751,8 +751,6 @@ void MainWindow::captureFileReadStarted(const QString &action) {
     showCapture();
     main_ui_->actionAnalyzeReloadLuaPlugins->setEnabled(false);
     main_ui_->wirelessTimelineWidget->captureFileReadStarted(capture_file_.capFile());
-
-    WiresharkApplication::processEvents();
 }
 
 void MainWindow::captureFileReadFinished() {
@@ -1924,9 +1922,9 @@ void MainWindow::actionEditCopyTriggered(MainWindow::CopySelected selection_type
 
     switch (selection_type) {
     case CopySelectedDescription:
-        if (finfo_selected && finfo_selected->rep
-            && strlen(finfo_selected->rep->representation) > 0) {
-            clip.append(finfo_selected->rep->representation);
+        if (proto_tree_->selectionModel()->hasSelection()) {
+            QModelIndex idx = proto_tree_->selectionModel()->selectedIndexes().first();
+            clip = idx.data(Qt::DisplayRole).toString();
         }
         break;
     case CopySelectedFieldName:
@@ -2810,10 +2808,7 @@ void MainWindow::on_actionAnalyzeEnabledProtocols_triggered()
 void MainWindow::on_actionAnalyzeDecodeAs_triggered()
 {
     QAction *da_action = qobject_cast<QAction*>(sender());
-    bool create_new = false;
-    if (da_action && da_action->data().toBool() == true) {
-        create_new = true;
-    }
+    bool create_new = da_action && da_action->property("create_new").toBool();
 
     DecodeAsDialog *da_dialog = new DecodeAsDialog(this, capture_file_.capFile(), create_new);
     connect(da_dialog, SIGNAL(destroyed(QObject*)), wsApp, SLOT(flushAppSignals()));

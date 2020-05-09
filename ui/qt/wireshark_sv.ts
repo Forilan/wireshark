@@ -992,6 +992,10 @@
         <translation>Förflutet</translation>
     </message>
     <message>
+        <source>Section %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Capture</source>
         <translation>Fånga</translation>
     </message>
@@ -1088,8 +1092,12 @@
         <translation>Genomsnittligt bitar/s</translation>
     </message>
     <message>
+        <source>Section Comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>File Comment</source>
-        <translation>Filkommentar</translation>
+        <translation type="vanished">Filkommentar</translation>
     </message>
     <message>
         <source>Packet Comments</source>
@@ -2295,32 +2303,20 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
         <translation>Typ</translation>
     </message>
     <message>
-        <source>Mac Address</source>
-        <translation>Mac-adress</translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation>Namn</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished">Adress</translation>
     </message>
     <message>
         <source>All entries</source>
         <translation>Alla poster</translation>
     </message>
     <message>
-        <source>IPv4 Hosts</source>
-        <translation>IPv4-värdar</translation>
-    </message>
-    <message>
-        <source>IPv4 Hash Table</source>
-        <translation>IPv4-hashtabell</translation>
-    </message>
-    <message>
-        <source>IPv6 Hosts</source>
-        <translation>IPv6-värdar</translation>
-    </message>
-    <message>
-        <source>IPv6 Hash Table</source>
-        <translation>IPv6-hashtabell</translation>
+        <source>Hosts</source>
+        <translation type="unfinished">Värdar</translation>
     </message>
     <message>
         <source>Ethernet Addresses</source>
@@ -2594,12 +2590,20 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
 <context>
     <name>ExtcapArgumentFileSelection</name>
     <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>All Files (</source>
         <translation>Alla filer (</translation>
     </message>
     <message>
         <source>Open File</source>
         <translation>Öppna fil</translation>
+    </message>
+    <message>
+        <source>Select File</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4120,6 +4124,10 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
         <translation>Sparar %1</translation>
     </message>
     <message>
+        <source>Analyzing IAX2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save forward stream CSV</source>
         <translation>Spara framåtströms-CSV</translation>
     </message>
@@ -4487,10 +4495,6 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
 <context>
     <name>InterfaceTreeModel</name>
     <message>
-        <source>No Interfaces found.</source>
-        <translation>Inga gränssnitt hittades.</translation>
-    </message>
-    <message>
         <source>Show</source>
         <translation>Visa</translation>
     </message>
@@ -4501,6 +4505,14 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
     <message>
         <source>Interface Name</source>
         <translation>Gränssnittsnamn</translation>
+    </message>
+    <message>
+        <source>No interfaces found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This version of Wireshark was built without packet capture support.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Local Pipe Path</source>
@@ -6617,10 +6629,6 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
         <translation>Ignorera alla visade paket</translation>
     </message>
     <message>
-        <source>Unignore All Displayed</source>
-        <translation>Avignorera alla visade</translation>
-    </message>
-    <message>
         <source>Set/Unset Time Reference</source>
         <translation>Ange/ta bort tidsreferens</translation>
     </message>
@@ -6993,6 +7001,10 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
         <translation>Filtrera denna association</translation>
     </message>
     <message>
+        <source>&amp;I/O Graphs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Conversations</source>
         <translation>&amp;Konversationer</translation>
     </message>
@@ -7197,6 +7209,14 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
         <translation>Ignorera eller avignorera varje valt paket</translation>
     </message>
     <message>
+        <source>U&amp;nignore All Displayed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unignore all displayed packets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Time Shift…</source>
         <translation>Tidsförskjutning …</translation>
     </message>
@@ -7235,10 +7255,6 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
     <message>
         <source>Export PDUs to File…</source>
         <translation>Exportera PDU:er till fil …</translation>
-    </message>
-    <message>
-        <source>&amp;I/O Graph</source>
-        <translation>&amp;I/O-graf</translation>
     </message>
     <message>
         <source>Create graphs based on display filter fields</source>
@@ -7601,10 +7617,6 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
     <message>
         <source>&amp;Unmark All Displayed</source>
         <translation>&amp;Avmarkera alla visade</translation>
-    </message>
-    <message>
-        <source>U&amp;nignore all displayed packets</source>
-        <translation>A&amp;vignorera alla visade paket</translation>
     </message>
     <message>
         <source>All VoIP Calls</source>
@@ -8075,6 +8087,22 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
     <message>
         <source>Icons &amp; Text</source>
         <translation>Ikoner &amp; text</translation>
+    </message>
+    <message>
+        <source>Window title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Custom window title to be appended to the existing title&lt;br/&gt;%F = file path of the capture file&lt;br/&gt;%P = profile name&lt;br/&gt;%S = a conditional separator (&amp;quot; - &amp;quot;) that only shows when surrounded by variables with values or static text&lt;br/&gt;%V = version info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prepend window title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Custom window title to be prepended to the existing title&lt;br/&gt;%F = file path of the capture file&lt;br/&gt;%P = profile name&lt;br/&gt;%S = a conditional separator (&amp;quot; - &amp;quot;) that only shows when surrounded by variables with values or static text&lt;br/&gt;%V = version info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Language: </source>
@@ -9056,6 +9084,10 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
     <message>
         <source>Frame</source>
         <translation>Ram</translation>
+    </message>
+    <message>
+        <source>TextLabel</source>
+        <translation type="unfinished">TextEtikett</translation>
     </message>
 </context>
 <context>
@@ -10283,6 +10315,10 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
     <message>
         <source>Raw (*.raw)</source>
         <translation>Rå (*.raw)</translation>
+    </message>
+    <message>
+        <source>Analyzing RTP</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Information</source>
@@ -11715,6 +11751,10 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
         <translation>Ingen giltigt areatyp vald.  Rapportera gärna detta till utvecklingsgruppen.</translation>
     </message>
     <message>
+        <source>Searching for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>No packet contained those bytes.</source>
         <translation>Inget paket innehöll dessa byte.</translation>
     </message>
@@ -12325,8 +12365,12 @@ Till exempel, använd 1 timma för att en ny fil skall skapas varje timma vid he
 <context>
     <name>SyntaxLineEdit</name>
     <message>
-        <source>&quot;%1&quot; is deprecated or may have unexpected results. See the User&apos;s Guide.</source>
-        <translation>”%1” undanbedes eller kan ha oväntade resultat.  Se användarguiden.</translation>
+        <source>&quot;%1&quot; is deprecated in favour of &quot;%2&quot;. See the User&apos;s Guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;%1&quot; may have unexpected results. See the User&apos;s Guide.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

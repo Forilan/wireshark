@@ -1530,7 +1530,7 @@ dissect_rach_channel_info(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
             encoded = tvb_get_guint8(tvb, offset);
             propagation_delay = encoded * 3;
             propagation_delay_ti = proto_tree_add_uint_format(tree, hf_fp_propagation_delay, tvb, offset, 1,
-                                               propagation_delay, "%u chips (%u)",
+                                               propagation_delay, "Propagation Delay: %u chips (%u)",
                                                propagation_delay, encoded);
             offset++;
         }
@@ -2120,7 +2120,7 @@ dissect_cpch_channel_info(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
         encoded = tvb_get_guint8(tvb, offset);
         propagation_delay = encoded * 3;
         proto_tree_add_uint_format_value(tree, hf_fp_propagation_delay, tvb, offset, 1,
-                                               propagation_delay, "%u chips (%u)",
+                                               propagation_delay, "Propagation Delay: %u chips (%u)",
                                                propagation_delay, encoded);
         offset++;
         header_length = offset; /* XXX this might be wrong */
@@ -2578,16 +2578,13 @@ dissect_dch_channel_info(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
         /* Dissect TB data */
         offset = dissect_tb_data(tvb, pinfo, tree, offset, p_fp_info, &mac_fdd_dch_handle, data);
 
-        /* QE (uplink only) */
+        /* QE and CRCI bits (uplink only) */
         if (p_fp_info->is_uplink) {
             proto_tree_add_item(tree, hf_fp_quality_estimate, tvb, offset, 1, ENC_BIG_ENDIAN);
             offset++;
-        }
-
-        /* CRCI bits (uplink only) */
-        if (p_fp_info->is_uplink) {
             offset = dissect_crci_bits(tvb, pinfo, tree, p_fp_info, offset);
         }
+
         if (preferences_header_checksum) {
             verify_header_crc(tvb, pinfo, header_crc_pi, header_crc, header_length);
         }
@@ -3549,9 +3546,8 @@ dissect_hsdsch_type_2_channel_info(tvbuff_t *tvb, packet_info *pinfo, proto_tree
             }
         }
 
-        if (header_length == 0) {
-            header_length = offset;
-        }
+        header_length = offset;
+
         /**********************************************/
         /* Optional fields indicated by earlier flags */
         if (drt_present) {
@@ -3812,9 +3808,8 @@ void dissect_hsdsch_common_channel_info(tvbuff_t *tvb, packet_info *pinfo, proto
                                    offset - block_header_start_offset);
             }
         }
-        if (header_length == 0) {
-            header_length = offset;
-        }
+
+        header_length = offset;
 
         /**********************************************/
         /* Optional fields indicated by earlier flags */
@@ -4124,10 +4119,11 @@ heur_dissect_fp_dcch_over_dch(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 
     /* Making sure we have at least enough bytes for header (3) + footer (2) */
     captured_length = tvb_captured_length(tvb);
-    reported_length = tvb_reported_length(tvb);
     if (captured_length < 5) {
         return FALSE;
     }
+    reported_length = tvb_reported_length(tvb);
+
     tfi = tvb_get_guint8(tvb, 2) & 0x1f;
 
     /* Checking if this is a DCH frame with 0 TBs*/
@@ -4938,7 +4934,7 @@ heur_dissect_fp_hsdsch_type_2(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
         return FALSE;
     }
 
-    captured_length = tvb_reported_length(tvb);
+    captured_length = tvb_captured_length(tvb);
     reported_length = tvb_reported_length(tvb);
     /* Lengths limit: header size + at least 1 PDU Block Header + CRC Payload size */
     if (captured_length < 11) {

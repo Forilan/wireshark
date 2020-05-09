@@ -159,6 +159,7 @@ set(WSUG_GRAPHICS
 	wsug_graphics/ws-go-menu.png
 	wsug_graphics/ws-goto-packet.png
 	wsug_graphics/ws-gui-preferences.png
+	wsug_graphics/ws-gui-preferences-advanced.png
 	wsug_graphics/ws-help-menu.png
 	wsug_graphics/ws-list-pane.png # Outdated
 	wsug_graphics/ws-main-toolbar.png
@@ -191,10 +192,9 @@ set(WSUG_GRAPHICS
 	wsug_graphics/ws-stats-conversations.png
 	wsug_graphics/ws-stats-endpoints.png
 	wsug_graphics/ws-stats-hierarchy.png
-	wsug_graphics/ws-stats-iographs.png # GTK+
+	wsug_graphics/ws-stats-iographs.png
 	wsug_graphics/ws-stats-packet-lengths.png
-	wsug_graphics/ws-stats-srt-dcerpc-filter.png # GTK+
-	wsug_graphics/ws-stats-srt-dcerpc.png # GTK+
+	wsug_graphics/ws-stats-srt-smb2.png
 	wsug_graphics/ws-stats-lte-mac-traffic.png
 	wsug_graphics/ws-stats-lte-rlc-traffic.png
 	wsug_graphics/ws-stats-wlan-traffic.png # GTK+
@@ -239,6 +239,7 @@ set(WSUG_GRAPHICS
 )
 
 set(WSDG_FILES
+	wsdg_src/WSDG_chapter_asn2wrs.adoc
 	wsdg_src/WSDG_chapter_build_intro.adoc
 	wsdg_src/WSDG_chapter_capture.adoc
 	wsdg_src/WSDG_chapter_dissection.adoc

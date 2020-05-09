@@ -9,7 +9,7 @@
  * Copyright 1998 Gerald Combs
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
- * Ref http://www.ietf.org/rfc/rfc4566.txt?number=4566
+ * Ref https://www.ietf.org/rfc/rfc4566
  */
 
 #include "config.h"
@@ -1696,8 +1696,13 @@ static void dissect_sdp_media_attribute(tvbuff_t *tvb, packet_info *pinfo, proto
                                 offset, tokenlen, ENC_UTF_8|ENC_NA);
             transport_info->sample_rate[pt] = 0;
             if (!ws_strtou32(tvb_get_string_enc(wmem_packet_scope(), tvb, offset, tokenlen, ENC_UTF_8|ENC_NA),
-                    NULL, &transport_info->sample_rate[pt]))
+                    NULL, &transport_info->sample_rate[pt])) {
                 expert_add_info(pinfo, pi, &ei_sdp_invalid_sample_rate);
+            } else if (!strcmp(transport_info->encoding_name[pt], "G722")) {
+                // The reported sampling rate is 8000, but the actual value is
+                // 16kHz. https://tools.ietf.org/html/rfc3551#section-4.5.2
+                proto_item_append_text(pi, " (RTP clock rate is 8kHz, actual sampling rate is 16kHz)");
+            }
             /* As per RFC2327 it is possible to have multiple Media Descriptions ("m=").
                For example:
 
@@ -1872,7 +1877,7 @@ static void dissect_sdp_media_attribute(tvbuff_t *tvb, packet_info *pinfo, proto
             }
             break;
         case SDP_CRYPTO:
-            /* http://tools.ietf.org/html/rfc4568
+            /* https://tools.ietf.org/html/rfc4568
             * 9.1.  Generic "Crypto" Attribute Grammar
             *
             *   The ABNF grammar for the crypto attribute is defined below:
@@ -2720,8 +2725,6 @@ dissect_sdp(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void* data)
 
     if (NULL != sdp_data.ed137_fid) {
       col_append_fstr(pinfo->cinfo, COL_INFO, "%s ", sdp_data.ed137_fid);
-      if (strlen(sdp_pi->summary_str))
-          g_strlcat(sdp_pi->summary_str, " ", 50);
       g_strlcat(sdp_pi->summary_str, sdp_data.ed137_fid, 50);
     }
     if (NULL != sdp_data.ed137_txrxmode) {

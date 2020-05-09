@@ -153,6 +153,11 @@ cf_read_status_t cf_read(capture_file *cf, gboolean from_save);
 gboolean cf_read_record(capture_file *cf, const frame_data *fdata,
                           wtap_rec *rec, Buffer *buf);
 
+/** Same as cf_read_record() but does not pop alert box on error */
+gboolean cf_read_record_no_alert(capture_file *cf, const frame_data *fdata,
+                                 wtap_rec *rec, Buffer *buf);
+
+
 /**
  * Read the metadata and raw data for the current record into a
  * capture_file structure's rec and buf for the current record.
@@ -665,15 +670,6 @@ cf_status_t
 cf_merge_files_to_tempfile(gpointer pd_window, char **out_filenamep,
                            int in_file_count, const char *const *in_filenames,
                            int file_type, gboolean do_append);
-
-
-/**
- * Get the comment on a capture from the SHB data block
- * XXX - should support multiple sections.
- *
- * @param cf the capture file
- */
-const gchar* cf_read_section_comment(capture_file *cf);
 
 /**
  * Update(replace) the comment on a capture from the SHB data block

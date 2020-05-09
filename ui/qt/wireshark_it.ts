@@ -323,11 +323,11 @@
     </message>
     <message>
         <source>LE ISO MTU</source>
-        <translation type="unfinished"></translation>
+        <translation>MTU ISO LE</translation>
     </message>
     <message>
         <source>LE ISO Total Packets</source>
-        <translation type="unfinished"></translation>
+        <translation>Pacchetti totali ISO LE</translation>
     </message>
     <message>
         <source>Inquiry Mode</source>
@@ -992,6 +992,10 @@
         <translation>Trascorso</translation>
     </message>
     <message>
+        <source>Section %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Capture</source>
         <translation>Cattura</translation>
     </message>
@@ -1088,8 +1092,12 @@
         <translation>Bit/s medi</translation>
     </message>
     <message>
+        <source>Section Comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>File Comment</source>
-        <translation>Commento file</translation>
+        <translation type="vanished">Commento file</translation>
     </message>
     <message>
         <source>Packet Comments</source>
@@ -2295,32 +2303,20 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
         <translation>Tipo</translation>
     </message>
     <message>
-        <source>Mac Address</source>
-        <translation>Indirizzo MAC</translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation>Nome</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Indirizzo</translation>
     </message>
     <message>
         <source>All entries</source>
         <translation>Tutte le voci.</translation>
     </message>
     <message>
-        <source>IPv4 Hosts</source>
-        <translation>Host IPv4</translation>
-    </message>
-    <message>
-        <source>IPv4 Hash Table</source>
-        <translation>Tabella hash IPv4</translation>
-    </message>
-    <message>
-        <source>IPv6 Hosts</source>
-        <translation>Host IPv6</translation>
-    </message>
-    <message>
-        <source>IPv6 Hash Table</source>
-        <translation>Tabella hash IPv6</translation>
+        <source>Hosts</source>
+        <translation>Host</translation>
     </message>
     <message>
         <source>Ethernet Addresses</source>
@@ -2594,12 +2590,20 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
 <context>
     <name>ExtcapArgumentFileSelection</name>
     <message>
+        <source>Clear</source>
+        <translation>Pulisci</translation>
+    </message>
+    <message>
         <source>All Files (</source>
         <translation>Tutti i file (</translation>
     </message>
     <message>
         <source>Open File</source>
         <translation>Apri file</translation>
+    </message>
+    <message>
+        <source>Select File</source>
+        <translation>Seleziona file</translation>
     </message>
 </context>
 <context>
@@ -4120,6 +4124,10 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
         <translation>Salvataggio di %1</translation>
     </message>
     <message>
+        <source>Analyzing IAX2</source>
+        <translation>Analisi IAX2</translation>
+    </message>
+    <message>
         <source>Save forward stream CSV</source>
         <translation>Salva CSV del flusso diretto</translation>
     </message>
@@ -4487,10 +4495,6 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
 <context>
     <name>InterfaceTreeModel</name>
     <message>
-        <source>No Interfaces found.</source>
-        <translation>Nessuna interfaccia trovata.</translation>
-    </message>
-    <message>
         <source>Show</source>
         <translation>Mostra</translation>
     </message>
@@ -4501,6 +4505,14 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
     <message>
         <source>Interface Name</source>
         <translation>Nome dell&apos;interfaccia</translation>
+    </message>
+    <message>
+        <source>No interfaces found.</source>
+        <translation>Nessuna interfaccia trovata.</translation>
+    </message>
+    <message>
+        <source>This version of Wireshark was built without packet capture support.</source>
+        <translation>Questa versione di Wireshark è stata compilata senza supporto per la cattura dei pacchetti.</translation>
     </message>
     <message>
         <source>Local Pipe Path</source>
@@ -6617,10 +6629,6 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
         <translation>Ignora tutti i pacchetti visualizzati</translation>
     </message>
     <message>
-        <source>Unignore All Displayed</source>
-        <translation>Considera tutti i visualizzati</translation>
-    </message>
-    <message>
         <source>Set/Unset Time Reference</source>
         <translation>Imposta/Rimuovi il riferimento temporale</translation>
     </message>
@@ -6993,6 +7001,10 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
         <translation>Filtra questa associazione</translation>
     </message>
     <message>
+        <source>&amp;I/O Graphs</source>
+        <translation>Grafici &amp;I/O</translation>
+    </message>
+    <message>
         <source>&amp;Conversations</source>
         <translation>&amp;Conversazioni</translation>
     </message>
@@ -7197,6 +7209,14 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
         <translation>Ignora o considera ogni pacchetto selezionato</translation>
     </message>
     <message>
+        <source>U&amp;nignore All Displayed</source>
+        <translation>Co&amp;nsidera tutti i visualizzati</translation>
+    </message>
+    <message>
+        <source>Unignore all displayed packets</source>
+        <translation>Considera tutti i pacchetti visualizzati</translation>
+    </message>
+    <message>
         <source>Time Shift…</source>
         <translation>Spostamento temporale...</translation>
     </message>
@@ -7235,10 +7255,6 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
     <message>
         <source>Export PDUs to File…</source>
         <translation>Esporta PDU su file...</translation>
-    </message>
-    <message>
-        <source>&amp;I/O Graph</source>
-        <translation>Grafici &amp;I/O</translation>
     </message>
     <message>
         <source>Create graphs based on display filter fields</source>
@@ -7601,10 +7617,6 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
     <message>
         <source>&amp;Unmark All Displayed</source>
         <translation>Rim&amp;uovi la selezione da tutti i visualizzati</translation>
-    </message>
-    <message>
-        <source>U&amp;nignore all displayed packets</source>
-        <translation>Co&amp;nsidera tutti i pacchetti visualizzati</translation>
     </message>
     <message>
         <source>All VoIP Calls</source>
@@ -8075,6 +8087,22 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
     <message>
         <source>Icons &amp; Text</source>
         <translation>Icone e testo</translation>
+    </message>
+    <message>
+        <source>Window title</source>
+        <translation>Titolo della finestra</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Custom window title to be appended to the existing title&lt;br/&gt;%F = file path of the capture file&lt;br/&gt;%P = profile name&lt;br/&gt;%S = a conditional separator (&amp;quot; - &amp;quot;) that only shows when surrounded by variables with values or static text&lt;br/&gt;%V = version info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Titolo della finestra personalizzato da aggiungere al titolo esistente&lt;br/&gt;%F = percorso del file di cattura&lt;br/&gt;%P = nome del profilo&lt;br/&gt;%S = un separatore condizionale (&amp;quot; - &amp;quot;) che è mostrato solo quando è circondato da variabili con valori o testo statico&lt;br/&gt;%V = informaziini di versione&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>Prepend window title</source>
+        <translation>Anteponi il titolo della finestra</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Custom window title to be prepended to the existing title&lt;br/&gt;%F = file path of the capture file&lt;br/&gt;%P = profile name&lt;br/&gt;%S = a conditional separator (&amp;quot; - &amp;quot;) that only shows when surrounded by variables with values or static text&lt;br/&gt;%V = version info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Titolo della finestra personalizzato da anteporre al titolo esistente&lt;br/&gt;%F = percorso del file di cattura&lt;br/&gt;%P = nome del profilo&lt;br/&gt;%S = un separatore condizionale (&amp;quot; - &amp;quot;) che è mostrato solo quando è circondato da variabili con valori o testo statico&lt;br/&gt;%V = informaziini di versione&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Language: </source>
@@ -9056,6 +9084,10 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
     <message>
         <source>Frame</source>
         <translation>Frame</translation>
+    </message>
+    <message>
+        <source>TextLabel</source>
+        <translation>EtichettaTesto</translation>
     </message>
 </context>
 <context>
@@ -10283,6 +10315,10 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
     <message>
         <source>Raw (*.raw)</source>
         <translation>Raw (*.raw)</translation>
+    </message>
+    <message>
+        <source>Analyzing RTP</source>
+        <translation>Analisi RTP</translation>
     </message>
     <message>
         <source>Information</source>
@@ -11715,6 +11751,10 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
         <translation>Nessuna area di ricerca valida selezionata. Segnala il problema alla squadra di sviluppo.</translation>
     </message>
     <message>
+        <source>Searching for %1</source>
+        <translation>Ricerca di %1</translation>
+    </message>
+    <message>
         <source>No packet contained those bytes.</source>
         <translation>Nessun pacchetto contiene questi byte.</translation>
     </message>
@@ -12325,8 +12365,12 @@ Ad esempio, usa 1 ora per fare in modo che un nuovo file sia creato ogni ora.</t
 <context>
     <name>SyntaxLineEdit</name>
     <message>
-        <source>&quot;%1&quot; is deprecated or may have unexpected results. See the User&apos;s Guide.</source>
-        <translation>&quot;%1&quot; è sconsigliato e potrebbe avere dei comportamenti inattesi. Vedi il Manuale utente.</translation>
+        <source>&quot;%1&quot; is deprecated in favour of &quot;%2&quot;. See the User&apos;s Guide.</source>
+        <translation>&quot;%1&quot; è sconsigliato in favore di &quot;%2&quot;. Vedi il Manuale utente.</translation>
+    </message>
+    <message>
+        <source>&quot;%1&quot; may have unexpected results. See the User&apos;s Guide.</source>
+        <translation>&quot;%1&quot; potrebbe avere dei risultati inattesi. Vedi il Manuale utente.</translation>
     </message>
 </context>
 <context>

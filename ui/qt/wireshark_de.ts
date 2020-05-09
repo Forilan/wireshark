@@ -323,11 +323,11 @@
     </message>
     <message>
         <source>LE ISO MTU</source>
-        <translation type="unfinished"></translation>
+        <translation>LE ISO MTU</translation>
     </message>
     <message>
         <source>LE ISO Total Packets</source>
-        <translation type="unfinished"></translation>
+        <translation>LE ISO Pakete gesamt</translation>
     </message>
     <message>
         <source>Inquiry Mode</source>
@@ -992,6 +992,10 @@
         <translation>Zeitspanne</translation>
     </message>
     <message>
+        <source>Section %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Capture</source>
         <translation>Mitschnitt</translation>
     </message>
@@ -1088,8 +1092,12 @@
         <translation>Durschnittliche Bit/s</translation>
     </message>
     <message>
+        <source>Section Comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>File Comment</source>
-        <translation>Dateikommentar</translation>
+        <translation type="vanished">Dateikommentar</translation>
     </message>
     <message>
         <source>Packet Comments</source>
@@ -2295,32 +2303,20 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
         <translation>Typ</translation>
     </message>
     <message>
-        <source>Mac Address</source>
-        <translation>Mac Adresse</translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation>Name</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresse</translation>
     </message>
     <message>
         <source>All entries</source>
         <translation>Alle Einträge</translation>
     </message>
     <message>
-        <source>IPv4 Hosts</source>
-        <translation>IPv4 Hosts</translation>
-    </message>
-    <message>
-        <source>IPv4 Hash Table</source>
-        <translation>IPv4 Hashtabelle</translation>
-    </message>
-    <message>
-        <source>IPv6 Hosts</source>
-        <translation>IPv6 Hosts</translation>
-    </message>
-    <message>
-        <source>IPv6 Hash Table</source>
-        <translation>IPv6 Hashtabelle</translation>
+        <source>Hosts</source>
+        <translation>Hosts</translation>
     </message>
     <message>
         <source>Ethernet Addresses</source>
@@ -2594,12 +2590,20 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
 <context>
     <name>ExtcapArgumentFileSelection</name>
     <message>
+        <source>Clear</source>
+        <translation>Zurücksetzen</translation>
+    </message>
+    <message>
         <source>All Files (</source>
         <translation>Alle Dateien (</translation>
     </message>
     <message>
         <source>Open File</source>
         <translation>Öffne Datei</translation>
+    </message>
+    <message>
+        <source>Select File</source>
+        <translation>Datei auswählen</translation>
     </message>
 </context>
 <context>
@@ -4120,6 +4124,10 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
         <translation>Speichere %1</translation>
     </message>
     <message>
+        <source>Analyzing IAX2</source>
+        <translation>Analysiere IAX2</translation>
+    </message>
+    <message>
         <source>Save forward stream CSV</source>
         <translation>Hinweg Stream als CSV speichern</translation>
     </message>
@@ -4487,10 +4495,6 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
 <context>
     <name>InterfaceTreeModel</name>
     <message>
-        <source>No Interfaces found.</source>
-        <translation>Keine Schnittstellen gefunden.</translation>
-    </message>
-    <message>
         <source>Show</source>
         <translation>Zeige</translation>
     </message>
@@ -4501,6 +4505,14 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
     <message>
         <source>Interface Name</source>
         <translation>Schnittstellenname</translation>
+    </message>
+    <message>
+        <source>No interfaces found.</source>
+        <translation>Keine Schnittstellen gefunden.</translation>
+    </message>
+    <message>
+        <source>This version of Wireshark was built without packet capture support.</source>
+        <translation>Diese Version von Wireshark wurde ohne Unterstützung von Paketaufzeichnung kompiliert.</translation>
     </message>
     <message>
         <source>Local Pipe Path</source>
@@ -6617,10 +6629,6 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
         <translation>Alle angezeigten Pakete ignorieren</translation>
     </message>
     <message>
-        <source>Unignore All Displayed</source>
-        <translation>Alle angezeigte Pakete nicht mehr ignorieren</translation>
-    </message>
-    <message>
         <source>Set/Unset Time Reference</source>
         <translation>Zeitreferenz setzen/zurücksetzen</translation>
     </message>
@@ -6993,6 +7001,10 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
         <translation>Diese Verknüpfung filtern</translation>
     </message>
     <message>
+        <source>&amp;I/O Graphs</source>
+        <translation>&amp;I/O Graph</translation>
+    </message>
+    <message>
         <source>&amp;Conversations</source>
         <translation>Verbindungen (&amp;C)</translation>
     </message>
@@ -7197,6 +7209,14 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
         <translation>Jedes ausgewählte Paket ignorieren bzw. Ignorieren zurücksetzen</translation>
     </message>
     <message>
+        <source>U&amp;nignore All Displayed</source>
+        <translation>Alle angezeigte Pakete nicht mehr ig&amp;norieren</translation>
+    </message>
+    <message>
+        <source>Unignore all displayed packets</source>
+        <translation>Alle angezeigte Pakete nicht mehr ignorieren</translation>
+    </message>
+    <message>
         <source>Time Shift…</source>
         <translation>Zeitverschieben...</translation>
     </message>
@@ -7235,10 +7255,6 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
     <message>
         <source>Export PDUs to File…</source>
         <translation>PDUs in Datei exportieren...</translation>
-    </message>
-    <message>
-        <source>&amp;I/O Graph</source>
-        <translation>&amp;I/O Graph</translation>
     </message>
     <message>
         <source>Create graphs based on display filter fields</source>
@@ -7601,10 +7617,6 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
     <message>
         <source>&amp;Unmark All Displayed</source>
         <translation>Markier&amp;ung bei allen angezeigten Paketen entfernen</translation>
-    </message>
-    <message>
-        <source>U&amp;nignore all displayed packets</source>
-        <translation>Alle angezeigte Pakete nicht mehr ig&amp;norieren</translation>
     </message>
     <message>
         <source>All VoIP Calls</source>
@@ -8075,6 +8087,22 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
     <message>
         <source>Icons &amp; Text</source>
         <translation>Icons &amp; Text</translation>
+    </message>
+    <message>
+        <source>Window title</source>
+        <translation>Fenstertitel</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Custom window title to be appended to the existing title&lt;br/&gt;%F = file path of the capture file&lt;br/&gt;%P = profile name&lt;br/&gt;%S = a conditional separator (&amp;quot; - &amp;quot;) that only shows when surrounded by variables with values or static text&lt;br/&gt;%V = version info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Angepasster Fenstertitel der dem bestehenden Titel angehängt wird&lt;br/&gt;%F = Dateipfad der Mitschnittdatei&lt;br/&gt;%P = Profilname&lt;br/&gt;%S = ein bedingtes Trennzeichen (&amp;quot; - &amp;quot;) dass nur angezeigt wird wenn es von Variablen mit Werten oder statische Text umgeben ist&lt;br/&gt;%V = Versionsinformation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>Prepend window title</source>
+        <translation>Fenstertitel anhängen</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Custom window title to be prepended to the existing title&lt;br/&gt;%F = file path of the capture file&lt;br/&gt;%P = profile name&lt;br/&gt;%S = a conditional separator (&amp;quot; - &amp;quot;) that only shows when surrounded by variables with values or static text&lt;br/&gt;%V = version info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Angepasster Fenstertitel der dem bestehenden Titel angehängt wird&lt;br/&gt;%F = Dateipfad der Mitschnittdatei&lt;br/&gt;%P = Profilname&lt;br/&gt;%S = ein bedingtes Trennzeichen (&amp;quot; - &amp;quot;) dass nur angezeigt wird wenn es von Variablen mit Werten oder statische Text umgeben ist&lt;br/&gt;%V = Versionsinformation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Language: </source>
@@ -9056,6 +9084,10 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
     <message>
         <source>Frame</source>
         <translation>Frame</translation>
+    </message>
+    <message>
+        <source>TextLabel</source>
+        <translation>Textbeschriftung</translation>
     </message>
 </context>
 <context>
@@ -10283,6 +10315,10 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
     <message>
         <source>Raw (*.raw)</source>
         <translation>Raw (*.raw)</translation>
+    </message>
+    <message>
+        <source>Analyzing RTP</source>
+        <translation>Analysiere RTP</translation>
     </message>
     <message>
         <source>Information</source>
@@ -11715,6 +11751,10 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
         <translation>Keinen gültigen Suchbereich ausgewählt. Bitte melden Sie dies dem Entwickler-Team.</translation>
     </message>
     <message>
+        <source>Searching for %1</source>
+        <translation>Suche nach %1</translation>
+    </message>
+    <message>
         <source>No packet contained those bytes.</source>
         <translation>Keine Pakete mit dieser Bytefolge gefunden.</translation>
     </message>
@@ -12325,8 +12365,12 @@ Um zum Beispiel eine neue Datei zu jeder vollen Stunde zu haben, 1 Stunde angebe
 <context>
     <name>SyntaxLineEdit</name>
     <message>
-        <source>&quot;%1&quot; is deprecated or may have unexpected results. See the User&apos;s Guide.</source>
-        <translation>&quot;%1&quot; ist veraltet und kann zu einem unerwarteten Ergebnis führen. Siehe Benutzerhandbuch.</translation>
+        <source>&quot;%1&quot; is deprecated in favour of &quot;%2&quot;. See the User&apos;s Guide.</source>
+        <translation>&quot;%1&quot; wurde durch &quot;%2&quot; abgelöst. Siehe Benutzerhandbuch.</translation>
+    </message>
+    <message>
+        <source>&quot;%1&quot; may have unexpected results. See the User&apos;s Guide.</source>
+        <translation>&quot;%1&quot; kann zu einem unerwarteten Ergebnis führen. Siehe Benutzerhandbuch.</translation>
     </message>
 </context>
 <context>

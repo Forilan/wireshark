@@ -4587,6 +4587,7 @@ static int hf_dis_vp_part_attached_to_id = -1;
 static int hf_dis_vp_artic_param_type = -1;
 static int hf_dis_vp_change = -1;
 static int hf_dis_vp_parameter_value = -1;
+static int hf_dis_vp_padding = -1;
 static int hf_dis_vr_exercise_id = -1;
 static int hf_dis_vr_exercise_file_path = -1;
 static int hf_dis_vr_exercise_file_name = -1;
@@ -5326,8 +5327,11 @@ static gint dissect_DIS_FIELDS_VP_ARTICULATED_PART(tvbuff_t *tvb, proto_tree *tr
     proto_tree_add_item(tree, hf_dis_vp_artic_param_type, tvb, offset, 4, ENC_BIG_ENDIAN);
     offset += 4;
 
-    proto_tree_add_item(tree, hf_dis_vp_parameter_value, tvb, offset, 8, ENC_BIG_ENDIAN);
-    offset += 8;
+    proto_tree_add_item(tree, hf_dis_vp_parameter_value, tvb, offset, 4, ENC_BIG_ENDIAN);
+    offset += 4;
+
+    proto_tree_add_item(tree, hf_dis_vp_padding, tvb, offset, 4, ENC_BIG_ENDIAN);
+    offset += 4;
 
     return offset;
 }
@@ -6090,7 +6094,6 @@ static int dissect_DIS_PARSER_ENTITY_STATE_UPDATE_PDU(tvbuff_t *tvb, packet_info
     entityEntity = tvb_get_ntohs(tvb, offset+4);
 
     offset = parseField_Entity(tvb, tree, offset, "Entity ID");
-    offset++;
 
     proto_tree_add_item(tree, hf_dis_padding, tvb, offset, 1, ENC_NA);
     offset++;
@@ -6098,6 +6101,7 @@ static int dissect_DIS_PARSER_ENTITY_STATE_UPDATE_PDU(tvbuff_t *tvb, packet_info
     numVariable = tvb_get_guint8(tvb, offset);
 
     proto_tree_add_item(tree, hf_dis_num_variable_records, tvb, offset, 1, ENC_BIG_ENDIAN); //number of variable parameter records
+    offset++;
 
     col_append_fstr( pinfo->cinfo, COL_INFO, ", (%u:%u:%u)",
                     entitySite , entityApplication , entityEntity
@@ -10191,7 +10195,12 @@ void proto_register_dis(void)
             },
             { &hf_dis_vp_parameter_value,
               { "Parameter Value",  "dis.vp.parameter_value",
-                FT_UINT64, BASE_DEC, NULL, 0x0,
+                FT_FLOAT, BASE_NONE, NULL, 0x0,
+                NULL, HFILL }
+            },
+            { &hf_dis_vp_padding,
+              { "Padding (unused)",  "dis.vp.padding",
+                FT_UINT32, BASE_DEC, NULL, 0x0,
                 NULL, HFILL }
             },
             { &hf_dis_vr_num_records,

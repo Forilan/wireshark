@@ -225,6 +225,7 @@ PacketList::PacketList(QWidget *parent) :
     mouse_pressed_at_(QModelIndex()),
     capture_in_progress_(false),
     tail_timer_id_(0),
+    tail_at_end_(0),
     rows_inserted_(false),
     columns_changed_(false),
     set_column_visibility_(false),
@@ -706,6 +707,7 @@ void PacketList::contextMenuEvent(QContextMenuEvent *event)
     ctx_menu->addSeparator();
     ctx_menu->addMenu(&proto_prefs_menu_);
     action = ctx_menu->addAction(tr("Decode As" UTF8_HORIZONTAL_ELLIPSIS));
+    action->setProperty("create_new", QVariant(true));
     connect(action, &QAction::triggered, this, &PacketList::ctxDecodeAsDialog);
     // "Print" not ported intentionally
     action = window()->findChild<QAction *>("actionViewShowPacketInNewWindow");
@@ -1057,7 +1059,7 @@ void PacketList::fieldsChanged(capture_file *cf)
     prefs.num_cols = g_list_length(prefs.col_list);
     col_cleanup(&cf->cinfo);
     build_column_format_array(&cf->cinfo, prefs.num_cols, FALSE);
-    // call packet_list_model_->resetColumns() ?
+    resetColumns();
 }
 
 // Column widths should
@@ -1167,8 +1169,8 @@ void PacketList::captureFileReadFinished()
 
 void PacketList::freeze()
 {
-    setUpdatesEnabled(false);
     column_state_ = header()->saveState();
+    setHeaderHidden(true);
     if (currentIndex().isValid()) {
         frozen_row_ = currentIndex().row();
     } else {
@@ -1186,7 +1188,7 @@ void PacketList::freeze()
 
 void PacketList::thaw(bool restore_selection)
 {
-    setUpdatesEnabled(true);
+    setHeaderHidden(false);
     setModel(packet_list_model_);
 
     // Resetting the model resets our column widths so we restore them here.
@@ -1438,6 +1440,8 @@ void PacketList::deleteAllPacketComments()
 void PacketList::setCaptureFile(capture_file *cf)
 {
     cap_file_ = cf;
+    packet_list_model_->setCaptureFile(cf);
+    packet_list_header_->setCaptureFile(cf);
     if (cf) {
         if (columns_changed_) {
             columnsChanged();
@@ -1447,8 +1451,6 @@ void PacketList::setCaptureFile(capture_file *cf)
             setColumnVisibility();
         }
     }
-    packet_list_model_->setCaptureFile(cf);
-    packet_list_header_->setCaptureFile(cf);
     create_near_overlay_ = true;
     sortByColumn(-1, Qt::AscendingOrder);
 }
@@ -1559,14 +1561,12 @@ void PacketList::markFrame()
 
     if (selectionModel() && selectionModel()->hasSelection())
     {
-        QList<int> rows;
         QModelIndexList selRows = selectionModel()->selectedRows(0);
         foreach (QModelIndex idx, selRows)
         {
             if (idx.isValid())
             {
                 frames << idx;
-                rows << idx.row();
             }
         }
     }
@@ -1595,13 +1595,11 @@ void PacketList::ignoreFrame()
 
     if (selectionModel() && selectionModel()->hasSelection())
     {
-        QList<int> rows;
         foreach (QModelIndex idx, selectionModel()->selectedRows(0))
         {
             if (idx.isValid())
             {
                 frames << idx;
-                rows << idx.row();
             }
         }
     }

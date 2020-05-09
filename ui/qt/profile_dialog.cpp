@@ -359,6 +359,9 @@ void ProfileDialog::updateWidgets()
             if (rows.count() > 1)
                 enable_ok = false;
         }
+
+        if (enable_ok && ! model_->checkIfDeleted(index) && index.data(ProfileModel::DATA_STATUS).toInt() == PROF_STAT_CHANGED)
+            hintUrl.clear();
     }
 
     pd_ui_->hintLabel->setUrl(hintUrl);
@@ -530,13 +533,13 @@ void ProfileDialog::on_buttonBox_helpRequested()
     wsApp->helpTopicAction(HELP_CONFIG_PROFILES_DIALOG);
 }
 
-void ProfileDialog::dataChanged(const QModelIndex &idx)
+void ProfileDialog::dataChanged(const QModelIndex &)
 {
     pd_ui_->lineProfileFilter->setText("");
     pd_ui_->cmbProfileTypes->setCurrentIndex(ProfileSortModel::AllProfiles);
 
     pd_ui_->profileTreeView->setFocus();
-    if (! idx.isValid() && model_->lastSetRow() >= 0)
+    if (model_->lastSetRow() >= 0)
     {
         QModelIndex original = model_->index(model_->lastSetRow(), ProfileModel::COL_NAME);
         pd_ui_->profileTreeView->setCurrentIndex(sort_model_->mapFromSource(original));
@@ -656,7 +659,7 @@ void ProfileDialog::importFromDirectory()
 
     int skipped = 0;
     QStringList import;
-    int count = model_->importProfilesFromDir(importDir.append(QDir::separator()), &skipped, false, &import);
+    int count = model_->importProfilesFromDir(importDir, &skipped, false, &import);
 
     finishImport(fi, count, skipped, import);
 }

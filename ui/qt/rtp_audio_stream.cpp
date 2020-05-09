@@ -45,13 +45,17 @@ RtpAudioStream::RtpAudioStream(QObject *parent, rtpstream_info_t *rtpstream) :
     start_abs_offset_(0.0),
     start_rel_time_(0.0),
     stop_rel_time_(0.0),
+    audio_stereo_(false),
+    audio_left_(false),
+    audio_right_(false),
     audio_out_rate_(0),
     audio_resampler_(0),
     audio_output_(0),
     max_sample_val_(1),
     color_(0),
     jitter_buffer_size_(50),
-    timing_mode_(RtpAudioStream::JitterBuffer)
+    timing_mode_(RtpAudioStream::JitterBuffer),
+    start_play_time_(0)
 {
     rtpstream_id_copy(&rtpstream->id, &id_);
 

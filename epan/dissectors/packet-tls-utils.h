@@ -150,23 +150,26 @@ typedef enum {
 #define SSL_HND_CERT_STATUS_TYPE_OCSP_MULTI  2
 #define SSL_HND_CERT_TYPE_RAW_PUBLIC_KEY     2
 
-#define SSL_HND_QUIC_TP_ORIGINAL_CONNECTION_ID              0
-#define SSL_HND_QUIC_TP_MAX_IDLE_TIMEOUT                    1
-#define SSL_HND_QUIC_TP_STATELESS_RESET_TOKEN               2
-#define SSL_HND_QUIC_TP_MAX_PACKET_SIZE                     3
-#define SSL_HND_QUIC_TP_INITIAL_MAX_DATA                    4
-#define SSL_HND_QUIC_TP_INITIAL_MAX_STREAM_DATA_BIDI_LOCAL  5
-#define SSL_HND_QUIC_TP_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE 6
-#define SSL_HND_QUIC_TP_INITIAL_MAX_STREAM_DATA_UNI         7
-#define SSL_HND_QUIC_TP_INITIAL_MAX_STREAMS_BIDI            8
-#define SSL_HND_QUIC_TP_INITIAL_MAX_STREAMS_UNI             9
-#define SSL_HND_QUIC_TP_ACK_DELAY_EXPONENT                  10
-#define SSL_HND_QUIC_TP_MAX_ACK_DELAY                       11
-#define SSL_HND_QUIC_TP_DISABLE_ACTIVE_MIGRATION            12
-#define SSL_HND_QUIC_TP_PREFERRED_ADDRESS                   13
-#define SSL_HND_QUIC_TP_ACTIVE_CONNECTION_ID_LIMIT          14
-#define SSL_HND_QUIC_TP_MAX_DATAGRAM_FRAME_SIZE             32
-#define SSL_HND_QUIC_TP_LOSS_BITS                           4183
+/* https://github.com/quicwg/base-drafts/wiki/Temporary-IANA-Registry#quic-transport-parameters */
+#define SSL_HND_QUIC_TP_ORIGINAL_CONNECTION_ID              0x00
+#define SSL_HND_QUIC_TP_MAX_IDLE_TIMEOUT                    0x01
+#define SSL_HND_QUIC_TP_STATELESS_RESET_TOKEN               0x02
+#define SSL_HND_QUIC_TP_MAX_PACKET_SIZE                     0x03
+#define SSL_HND_QUIC_TP_INITIAL_MAX_DATA                    0x04
+#define SSL_HND_QUIC_TP_INITIAL_MAX_STREAM_DATA_BIDI_LOCAL  0x05
+#define SSL_HND_QUIC_TP_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE 0x06
+#define SSL_HND_QUIC_TP_INITIAL_MAX_STREAM_DATA_UNI         0x07
+#define SSL_HND_QUIC_TP_INITIAL_MAX_STREAMS_BIDI            0x08
+#define SSL_HND_QUIC_TP_INITIAL_MAX_STREAMS_UNI             0x09
+#define SSL_HND_QUIC_TP_ACK_DELAY_EXPONENT                  0x0a
+#define SSL_HND_QUIC_TP_MAX_ACK_DELAY                       0x0b
+#define SSL_HND_QUIC_TP_DISABLE_ACTIVE_MIGRATION            0x0c
+#define SSL_HND_QUIC_TP_PREFERRED_ADDRESS                   0x0d
+#define SSL_HND_QUIC_TP_ACTIVE_CONNECTION_ID_LIMIT          0x0e
+#define SSL_HND_QUIC_TP_MAX_DATAGRAM_FRAME_SIZE             0x20 /* https://tools.ietf.org/html/draft-pauly-quic-datagram-05 */
+#define SSL_HND_QUIC_TP_LOSS_BITS                           0x1057 /* https://tools.ietf.org/html/draft-ferrieuxhamchaoui-quic-lossbits-03 */
+#define SSL_HND_QUIC_TP_ENABLE_TIME_STAMP                   0x7157 /* https://tools.ietf.org/html/draft-huitema-quic-ts-02 */
+#define SSL_HND_QUIC_TP_MIN_ACK_DELAY                       0xde1a /* https://tools.ietf.org/html/draft-iyengar-quic-delayed-ack-00 */
 /*
  * Lookup tables
  */
@@ -502,7 +505,7 @@ typedef struct {
 
 gint ssl_get_keyex_alg(gint cipher);
 
-void quic_transport_parameter_id_base_custom(gchar *result, guint32 parameter_id);
+void quic_transport_parameter_id_base_custom(gchar *result, guint64 parameter_id);
 
 gboolean ssldecrypt_uat_fld_ip_chk_cb(void*, const char*, unsigned, const void*, const void*, char** err);
 gboolean ssldecrypt_uat_fld_port_chk_cb(void*, const char*, unsigned, const void*, const void*, char** err);
@@ -820,6 +823,18 @@ typedef struct ssl_common_dissect {
         gint hs_client_keyex_yc;
         gint hs_server_keyex_point;
         gint hs_client_keyex_point;
+        gint hs_server_keyex_xs_len;
+        gint hs_client_keyex_xc_len;
+        gint hs_server_keyex_xs;
+        gint hs_client_keyex_xc;
+        gint hs_server_keyex_vs_len;
+        gint hs_client_keyex_vc_len;
+        gint hs_server_keyex_vs;
+        gint hs_client_keyex_vc;
+        gint hs_server_keyex_rs_len;
+        gint hs_client_keyex_rc_len;
+        gint hs_server_keyex_rs;
+        gint hs_client_keyex_rc;
         gint hs_server_keyex_modulus;
         gint hs_server_keyex_exponent;
         gint hs_server_keyex_sig;
@@ -836,6 +851,7 @@ typedef struct ssl_common_dissect {
         gint hs_cert_type;
         gint hs_dnames_len;
         gint hs_dnames;
+        gint hs_dnames_truncated;
         gint hs_dname_len;
         gint hs_dname;
         gint hs_random;
@@ -896,6 +912,7 @@ typedef struct ssl_common_dissect {
         gint hs_ext_quictp_parameter;
         gint hs_ext_quictp_parameter_type;
         gint hs_ext_quictp_parameter_len;
+        gint hs_ext_quictp_parameter_len_old;
         gint hs_ext_quictp_parameter_value;
         gint hs_ext_quictp_parameter_ocid;
         gint hs_ext_quictp_parameter_max_idle_timeout;
@@ -919,6 +936,7 @@ typedef struct ssl_common_dissect {
         gint hs_ext_quictp_parameter_active_connection_id_limit;
         gint hs_ext_quictp_parameter_max_datagram_frame_size;
         gint hs_ext_quictp_parameter_loss_bits;
+        gint hs_ext_quictp_parameter_min_ack_delay;
 
         gint esni_suite;
         gint esni_record_digest_length;
@@ -1147,7 +1165,8 @@ ssl_common_dissect_t name = {   \
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, \
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, \
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, \
-        -1, -1, -1, -1, -1,                                             \
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, \
+        -1, -1, -1, -1,                                                 \
     },                                                                  \
     /* ett */ {                                                         \
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, \
@@ -1571,6 +1590,66 @@ ssl_common_dissect_t name = {   \
         FT_BYTES, BASE_NONE, NULL, 0x0,                                 \
         "EC Diffie-Hellman client pubkey", HFILL }                      \
     },                                                                  \
+    { & name .hf.hs_server_keyex_xs_len,                                \
+      { "Pubkey Length", prefix ".handshake.xs_len",                    \
+        FT_UINT8, BASE_DEC, NULL, 0x0,                                  \
+        "Length of EC J-PAKE server public key", HFILL }                \
+    },                                                                  \
+    { & name .hf.hs_client_keyex_xc_len,                                \
+      { "Pubkey Length", prefix ".handshake.xc_len",                    \
+        FT_UINT8, BASE_DEC, NULL, 0x0,                                  \
+        "Length of EC J-PAKE client public key", HFILL }                \
+    },                                                                  \
+    { & name .hf.hs_server_keyex_xs,                                    \
+      { "Pubkey", prefix ".handshake.xs",                               \
+        FT_BYTES, BASE_NONE, NULL, 0x0,                                 \
+        "EC J-PAKE server public key", HFILL }                          \
+    },                                                                  \
+    { & name .hf.hs_client_keyex_xc,                                    \
+      { "Pubkey", prefix ".handshake.xc",                               \
+        FT_BYTES, BASE_NONE, NULL, 0x0,                                 \
+        "EC J-PAKE client public key", HFILL }                          \
+    },                                                                  \
+    { & name .hf.hs_server_keyex_vs_len,                                \
+      { "Ephemeral Pubkey Length", prefix ".handshake.vs_len",          \
+        FT_UINT8, BASE_DEC, NULL, 0x0,                                  \
+        "Length of EC J-PAKE server ephemeral public key", HFILL }      \
+    },                                                                  \
+    { & name .hf.hs_client_keyex_vc_len,                                \
+      { "Ephemeral Pubkey Length", prefix ".handshake.vc_len",          \
+        FT_UINT8, BASE_DEC, NULL, 0x0,                                  \
+        "Length of EC J-PAKE client ephemeral public key", HFILL }      \
+    },                                                                  \
+    { & name .hf.hs_server_keyex_vs,                                    \
+      { "Ephemeral Pubkey", prefix ".handshake.vs",                     \
+        FT_BYTES, BASE_NONE, NULL, 0x0,                                 \
+        "EC J-PAKE server ephemeral public key", HFILL }                \
+    },                                                                  \
+    { & name .hf.hs_client_keyex_vc,                                    \
+      { "Ephemeral Pubkey", prefix ".handshake.vc",                     \
+        FT_BYTES, BASE_NONE, NULL, 0x0,                                 \
+        "EC J-PAKE client ephemeral public key", HFILL }                \
+    },                                                                  \
+    { & name .hf.hs_server_keyex_rs_len,                                \
+      { "Schnorr signature Length", prefix ".handshake.rs_len",         \
+        FT_UINT8, BASE_DEC, NULL, 0x0,                                  \
+        "Length of EC J-PAKE server Schnorr signature", HFILL }         \
+    },                                                                  \
+    { & name .hf.hs_client_keyex_rc_len,                                \
+      { "Schnorr signature Length", prefix ".handshake.rc_len",         \
+        FT_UINT8, BASE_DEC, NULL, 0x0,                                  \
+        "Length of EC J-PAKE client Schnorr signature", HFILL }         \
+    },                                                                  \
+    { & name .hf.hs_server_keyex_rs,                                    \
+      { "Schnorr signature", prefix ".handshake.rs",                    \
+        FT_BYTES, BASE_NONE, NULL, 0x0,                                 \
+        "EC J-PAKE server Schnorr signature", HFILL }                   \
+    },                                                                  \
+    { & name .hf.hs_client_keyex_rc,                                    \
+      { "Schnorr signature", prefix ".handshake.rc",                    \
+        FT_BYTES, BASE_NONE, NULL, 0x0,                                 \
+        "EC J-PAKE client Schnorr signature", HFILL }                   \
+    },                                                                  \
     { & name .hf.hs_server_keyex_modulus,                               \
       { "Modulus", prefix ".handshake.modulus",                         \
         FT_BYTES, BASE_NONE, NULL, 0x0,                                 \
@@ -1660,6 +1739,11 @@ ssl_common_dissect_t name = {   \
       { "Distinguished Name Length", prefix ".handshake.dname_len",     \
         FT_UINT16, BASE_DEC, NULL, 0x0,                                 \
         "Length of distinguished name", HFILL }                         \
+    },                                                                  \
+    { & name .hf.hs_dnames_truncated,                                   \
+      { "Tree view truncated", prefix ".handshake.dnames_truncated",    \
+         FT_NONE, BASE_NONE, NULL, 0x00,                                \
+         "Some Distinguished Names are not added to tree pane to limit resources", HFILL } \
     },                                                                  \
     { & name .hf.hs_dname,                                              \
       { "Distinguished Name", prefix ".handshake.dname",                \
@@ -1915,10 +1999,15 @@ ssl_common_dissect_t name = {   \
     },                                                                  \
     { & name .hf.hs_ext_quictp_parameter_type,                          \
       { "Type", prefix ".quic.parameter.type",                          \
-        FT_UINT16, BASE_CUSTOM, CF_FUNC(quic_transport_parameter_id_base_custom), 0x00,    \
+        FT_UINT64, BASE_CUSTOM, CF_FUNC(quic_transport_parameter_id_base_custom), 0x00,    \
         NULL, HFILL }                                                   \
     },                                                                  \
     { & name .hf.hs_ext_quictp_parameter_len,                           \
+      { "Length", prefix ".quic.parameter.length",                      \
+        FT_UINT64, BASE_DEC, NULL, 0x00,                                \
+        NULL, HFILL }                                                   \
+    },                                                                  \
+    { & name .hf.hs_ext_quictp_parameter_len_old,                       \
       { "Length", prefix ".quic.parameter.length",                      \
         FT_UINT16, BASE_DEC, NULL, 0x00,                                \
         NULL, HFILL }                                                   \
@@ -2036,6 +2125,11 @@ ssl_common_dissect_t name = {   \
     { & name .hf.hs_ext_quictp_parameter_loss_bits,                     \
       { "loss_bits", prefix ".quic.parameter.loss_bits",                \
         FT_UINT8, BASE_DEC, NULL, 0x00,                                 \
+        NULL, HFILL }                                                   \
+    },                                                                  \
+    { & name .hf.hs_ext_quictp_parameter_min_ack_delay,                 \
+      { "min_ack_delay", prefix ".quic.parameter.min_ack_delay",        \
+        FT_UINT64, BASE_DEC, NULL, 0x00,                                \
         NULL, HFILL }                                                   \
     },                                                                  \
     { & name .hf.esni_suite,                                            \

@@ -1,7 +1,7 @@
 /* packet-nr-rrc-template.c
  * NR;
  * Radio Resource Control (RRC) protocol specification
- * (3GPP TS 38.331 V15.8.0 Release 15) packet dissection
+ * (3GPP TS 38.331 V15.9.0 Release 15) packet dissection
  * Copyright 2018-2020, Pascal Quantin
  *
  * Wireshark - Network traffic analyzer
@@ -162,7 +162,9 @@ nr_rrc_call_dissector(dissector_handle_t handle, tvbuff_t *tvb, packet_info *pin
 static void
 nr_rrc_q_RxLevMin_fmt(gchar *s, guint32 v)
 {
-  g_snprintf(s, ITEM_LABEL_LENGTH, "%u dB (%u)", 2*v, v);
+  gint32 d = (gint32)v;
+
+  g_snprintf(s, ITEM_LABEL_LENGTH, "%d dB (%d)", 2*d, d);
 }
 
 static const value_string nr_rrc_serialNumber_gs_vals[] = {

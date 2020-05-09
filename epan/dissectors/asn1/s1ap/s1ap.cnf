@@ -22,8 +22,10 @@ Cause
 #.EXPORTS
 EN-DCSONConfigurationTransfer_PDU
 ENB-StatusTransfer-TransparentContainer_PDU
+EUTRAN-CGI_PDU
 Global-ENB-ID_PDU
 Global-ENB-ID
+HandoverRestrictionList_PDU
 LastVisitedEUTRANCellInformation_PDU
 LastVisitedGERANCellInformation_PDU
 SourceeNB-ToTargeteNB-TransparentContainer_PDU
@@ -35,11 +37,12 @@ SONtransferResponseContainer
 SONtransferCause_PDU
 TargeteNB-ToSourceeNB-TransparentContainer_PDU
 UE-HistoryInformation_PDU
-EUTRAN-CGI_PDU
 
 #.PDU
 EN-DCSONConfigurationTransfer
 ENB-StatusTransfer-TransparentContainer
+EUTRAN-CGI
+HandoverRestrictionList
 LastVisitedEUTRANCellInformation
 LastVisitedGERANCellInformation
 S1AP-PDU
@@ -50,7 +53,6 @@ SONtransferResponseContainer
 SONtransferCause
 TargeteNB-ToSourceeNB-TransparentContainer
 UE-HistoryInformation
-EUTRAN-CGI
 
 #.MAKE_ENUM
 HandoverType
@@ -837,9 +839,9 @@ ProtocolExtensionID TYPE = FT_UINT8  DISPLAY = BASE_DEC|BASE_EXT_STRING STRINGS 
   if (!parameter_tvb)
     return offset;
 
-    subtree = proto_item_add_subtree(actx->created_item, ett_s1ap_S1_Message);
-    col_set_fence(actx->pinfo->cinfo, COL_INFO);
-    call_dissector(s1ap_handle, parameter_tvb, actx->pinfo, subtree);
+  subtree = proto_item_add_subtree(actx->created_item, ett_s1ap_S1_Message);
+  col_set_fence(actx->pinfo->cinfo, COL_INFO);
+  call_dissector(s1ap_handle, parameter_tvb, actx->pinfo, subtree);
 
 #.FN_BODY E-UTRAN-Trace-ID VAL_PTR = &parameter_tvb
   tvbuff_t *parameter_tvb;

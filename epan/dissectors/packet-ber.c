@@ -1602,7 +1602,7 @@ proto_tree_add_debug_text(tree, "OCTET STRING dissect_ber_octet_string(%s) enter
                     "BER Error: OctetString expected but class:%s(%d) %s tag:%d was unexpected",
                     val_to_str_const(ber_class, ber_class_codes, "Unknown"),
                     ber_class,
-                    pc ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+                    tfs_get_string(pc, &ber_pc_codes_short),
                     tag);
                 if (decode_unexpected) {
                     proto_tree *unknown_tree = proto_item_add_subtree(cause, ett_ber_unknown);
@@ -1829,14 +1829,14 @@ dissect_ber_null(gboolean implicit_tag, asn1_ctx_t *actx, proto_tree *tree, tvbu
         offset = dissect_ber_identifier(actx->pinfo, tree, tvb, offset, &ber_class, &pc, &tag);
         identifier_len = offset - identifier_offset;
         if (pc ||
-            (!implicit_tag && ((ber_class != BER_CLASS_UNI) || (tag != BER_UNI_TAG_NULL)))) {
+            ((ber_class != BER_CLASS_UNI) || (tag != BER_UNI_TAG_NULL))) {
             proto_tree_add_expert_format(
                 tree, actx->pinfo, &ei_ber_expected_null,
                 tvb, identifier_offset, identifier_len,
                 "BER Error: NULL expected but class:%s(%d) %s tag:%d was unexpected",
                 val_to_str_const(ber_class, ber_class_codes, "Unknown"),
                 ber_class,
-                pc ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+                tfs_get_string(pc, &ber_pc_codes_short),
                 tag);
         }
 
@@ -2205,7 +2205,7 @@ proto_tree_add_debug_text(tree, "SEQUENCE dissect_ber_sequence(%s) entered\n", n
         /* sanity check: we only handle Constructed Universal Sequences */
         if ((classx != BER_CLASS_APP) && (classx != BER_CLASS_PRI)) {
             if (!pcx
-             || (!implicit_tag && ((classx != BER_CLASS_UNI) || (tagx != BER_UNI_TAG_SEQUENCE)))) {
+             || ((classx != BER_CLASS_UNI) || (tagx != BER_UNI_TAG_SEQUENCE))) {
                 tvb_ensure_bytes_exist(tvb, hoffset, 2);
                 cause = proto_tree_add_expert_format(
                     tree, actx->pinfo, &ei_ber_expected_sequence,
@@ -2213,7 +2213,7 @@ proto_tree_add_debug_text(tree, "SEQUENCE dissect_ber_sequence(%s) entered\n", n
                     "BER Error: Sequence expected but class:%s(%d) %s tag:%d was unexpected",
                     val_to_str_const(classx, ber_class_codes, "Unknown"),
                     classx,
-                    pcx ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+                    tfs_get_string(pcx, &ber_pc_codes_short),
                     tagx);
                 if (decode_unexpected) {
                     proto_tree *unknown_tree = proto_item_add_subtree(cause, ett_ber_unknown);
@@ -2565,8 +2565,7 @@ proto_tree_add_debug_text(tree, "SET dissect_ber_set(%s) entered\n", name);
         /* sanity check: we only handle Constructed Universal Sets */
         if ((classx != BER_CLASS_APP) && (classx != BER_CLASS_PRI)) {
             if (!pcx
-             || (!implicit_tag && ((classx != BER_CLASS_UNI)
-                                || (tagx != BER_UNI_TAG_SET)))) {
+             || ((classx != BER_CLASS_UNI) || (tagx != BER_UNI_TAG_SET))) {
                 tvb_ensure_bytes_exist(tvb, hoffset, 2);
                 cause = proto_tree_add_expert_format(
                     tree, actx->pinfo, &ei_ber_expected_set,
@@ -2574,7 +2573,7 @@ proto_tree_add_debug_text(tree, "SET dissect_ber_set(%s) entered\n", name);
                     "BER Error: SET expected but class:%s(%d) %s tag:%d was found",
                     val_to_str_const(classx, ber_class_codes, "Unknown"),
                     classx,
-                    pcx ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+                    tfs_get_string(pcx, &ber_pc_codes_short),
                     tagx);
                 if (decode_unexpected) {
                     proto_tree *unknown_tree = proto_item_add_subtree(cause, ett_ber_unknown);
@@ -3068,7 +3067,7 @@ dissect_ber_GeneralString(asn1_ctx_t *actx, proto_tree *tree, tvbuff_t *tvb, int
             tvb, identifier_offset, identifier_len,
             "BER Error: GeneralString expected but class:%s(%d) %s tag:%d was unexpected",
             val_to_str_const(ber_class, ber_class_codes, "Unknown"),
-            ber_class, pc ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+            ber_class, tfs_get_string(pc, &ber_pc_codes_short),
             tag);
         if (decode_unexpected) {
             proto_tree *unknown_tree = proto_item_add_subtree(cause, ett_ber_unknown);
@@ -3139,7 +3138,7 @@ proto_tree_add_debug_text(tree, "RESTRICTED STRING dissect_ber_octet_string(%s) 
                 "BER Error: String with tag=%d expected but class:%s(%d) %s tag:%d was unexpected",
                 type,
                 val_to_str_const(ber_class, ber_class_codes, "Unknown"),
-                ber_class, pc ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+                ber_class, tfs_get_string(pc, &ber_pc_codes_short),
                 tag);
             if (decode_unexpected) {
                 proto_tree *unknown_tree = proto_item_add_subtree(cause, ett_ber_unknown);
@@ -3240,7 +3239,7 @@ proto_tree_add_debug_text(tree, "OBJECT IDENTIFIER dissect_ber_any_oid(%s) enter
                 "BER Error: Object Identifier expected but class:%s(%d) %s tag:%d was unexpected",
                 val_to_str_const(ber_class, ber_class_codes, "Unknown"),
                 ber_class,
-                pc ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+                tfs_get_string(pc, &ber_pc_codes_short),
                 tag);
             if (decode_unexpected) {
                 proto_tree *unknown_tree = proto_item_add_subtree(cause, ett_ber_unknown);
@@ -3375,8 +3374,7 @@ proto_tree_add_debug_text(tree, "SQ OF dissect_ber_sq_of(%s) entered\n", name);
         /* sanity check: we only handle Constructed Universal Sequences */
         if ((classx != BER_CLASS_APP) && (classx != BER_CLASS_PRI)) {
             if (!pcx
-             || (!implicit_tag && ((classx != BER_CLASS_UNI)
-                                || (tagx != type)))) {
+             || ((classx != BER_CLASS_UNI) || (tagx != type))) {
                 tvb_ensure_bytes_exist(tvb, hoffsetx, 2);
                 causex = proto_tree_add_expert_format(
                     tree, actx->pinfo,
@@ -3385,7 +3383,7 @@ proto_tree_add_debug_text(tree, "SQ OF dissect_ber_sq_of(%s) entered\n", name);
                     "BER Error: %s OF expected but class:%s(%d) %s tag:%d was unexpected",
                     (type == BER_UNI_TAG_SEQUENCE) ? "SET" : "SEQUENCE",
                     val_to_str_const(classx, ber_class_codes, "Unknown"),
-                    classx, pcx ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+                    classx, tfs_get_string(pcx, &ber_pc_codes_short),
                     tagx);
                 if (decode_unexpected) {
                     proto_tree *unknown_tree = proto_item_add_subtree(causex, ett_ber_unknown);
@@ -3635,8 +3633,7 @@ dissect_ber_GeneralizedTime(gboolean implicit_tag, asn1_ctx_t *actx, proto_tree 
         end_offset = offset+len;
 
         /* sanity check. we only handle universal/generalized time */
-        if ( (ber_class != BER_CLASS_UNI)
-          || (tag != BER_UNI_TAG_GeneralizedTime)) {
+        if ( (ber_class != BER_CLASS_UNI) || (tag != BER_UNI_TAG_GeneralizedTime)) {
             tvb_ensure_bytes_exist(tvb, hoffset, 2);
             cause = proto_tree_add_expert_format(
                 tree, actx->pinfo, &ei_ber_expected_generalized_time,
@@ -3644,7 +3641,7 @@ dissect_ber_GeneralizedTime(gboolean implicit_tag, asn1_ctx_t *actx, proto_tree 
                 "BER Error: GeneralizedTime expected but class:%s(%d) %s tag:%d was unexpected",
                 val_to_str_const(ber_class, ber_class_codes, "Unknown"),
                 ber_class,
-                pc ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+                tfs_get_string(pc, &ber_pc_codes_short),
                 tag);
             if (decode_unexpected) {
                 proto_tree *unknown_tree = proto_item_add_subtree(cause, ett_ber_unknown);
@@ -3830,7 +3827,7 @@ dissect_ber_UTCTime(gboolean implicit_tag, asn1_ctx_t *actx, proto_tree *tree, t
                 "BER Error: UTCTime expected but class:%s(%d) %s tag:%d was unexpected",
                 val_to_str_const(ber_class, ber_class_codes, "Unknown"),
                 ber_class,
-                pc ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+                tfs_get_string(pc, &ber_pc_codes_short),
                 tag);
             if (decode_unexpected) {
                 proto_tree *unknown_tree = proto_item_add_subtree(cause, ett_ber_unknown);
@@ -3990,7 +3987,7 @@ dissect_ber_constrained_bitstring(gboolean implicit_tag, asn1_ctx_t *actx, proto
            So here we relax it for APPLICATION tags. CONTEXT tags may
            still cause a problem. */
 
-        if (!implicit_tag && (ber_class != BER_CLASS_APP)) {
+        if (ber_class != BER_CLASS_APP) {
             if ((ber_class != BER_CLASS_UNI)
                 || (tag != BER_UNI_TAG_BITSTRING)) {
                 tvb_ensure_bytes_exist(tvb, hoffset, 2);
@@ -3999,7 +3996,7 @@ dissect_ber_constrained_bitstring(gboolean implicit_tag, asn1_ctx_t *actx, proto
                     tvb, identifier_offset, identifier_len,
                     "BER Error: BitString expected but class:%s(%d) %s tag:%d was unexpected",
                     val_to_str_const(ber_class, ber_class_codes, "Unknown"),
-                    ber_class, pc ? ber_pc_codes_short.true_string : ber_pc_codes_short.false_string,
+                    ber_class, tfs_get_string(pc, &ber_pc_codes_short),
                     tag);
                 if (decode_unexpected) {
                     proto_tree *unknown_tree = proto_item_add_subtree(cause, ett_ber_unknown);

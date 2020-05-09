@@ -65,6 +65,7 @@ QWidget * ExtArgTimestamp::createEditor(QWidget * parent)
     tsBox = new QDateTimeEdit(ts, parent);
     tsBox->setDisplayFormat(QLocale::system().dateTimeFormat());
     tsBox->setCalendarPopup(true);
+    tsBox->setAutoFillBackground(true);
 
     if (_argument->tooltip != NULL)
         tsBox->setToolTip(QString().fromUtf8(_argument->tooltip));
@@ -448,6 +449,34 @@ bool ExtArgText::isValid()
     bool valid = true;
 
     if (isRequired() && value().length() == 0)
+        valid = false;
+
+    /* Does the validator, if any, consider the value valid?
+     *
+     * If it considers it an "intermediate" value, rather than an "invalid"
+     * value, the user will be able to transfer the input focus to another
+     * widget, and, as long as all widgets have values for which isValid()
+     * is true, they wil be able to click the "Start" button.
+     *
+     * For QIntValidator(), used for integral fields with minimum and
+     * maximum values, a value that's larger than the maximum but has
+     * the same number of digits as the maximum is "intermediate" rather
+     * than "invalid", so the user will be able to cause that value to
+     * be passed to the extcap module; see bug 16510.
+     *
+     * So we explicitly call the hasAcceptableInput() method on the
+     * text box; that returns false if the value is not "valid", and
+     * that includes "intermediate" values.
+     *
+     * This way, 1) non-colorblind users are informed that the value
+     * is invalid by the text box background being red (perhaps the
+     * user isn't fully colorblind, or perhaps the background is a
+     * noticeably different grayscale), and 2) the user won't be able
+     * to start the capture until they fix the problem.
+     *
+     * XXX - it might be nice to have some way of indicating to the
+     * user what the problem is with the value - alert box?  Tooltip? */
+    if (!textBox->hasAcceptableInput())
         valid = false;
 
     /* validation should only be checked if there is a value. if the argument

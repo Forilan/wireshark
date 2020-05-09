@@ -93,7 +93,7 @@
     </message>
     <message>
         <source>The directory %1 could not be created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Каталог %1 не может быть создан.</translation>
     </message>
     <message>
         <source>Show in Finder</source>
@@ -999,6 +999,10 @@
         <translation>Прошло</translation>
     </message>
     <message>
+        <source>Section %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Capture</source>
         <translation>Захват</translation>
     </message>
@@ -1095,8 +1099,12 @@
         <translation>В среднем бит/с</translation>
     </message>
     <message>
+        <source>Section Comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>File Comment</source>
-        <translation>Комментарии к файлу</translation>
+        <translation type="vanished">Комментарии к файлу</translation>
     </message>
     <message>
         <source>Packet Comments</source>
@@ -1188,15 +1196,15 @@
     <name>CaptureOptionsDialog</name>
     <message>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Ввод</translation>
     </message>
     <message>
         <source>Interface</source>
-        <translation type="unfinished">Интерфейс</translation>
+        <translation>Интерфейс</translation>
     </message>
     <message>
         <source>Traffic</source>
-        <translation type="unfinished"></translation>
+        <translation>Трафик</translation>
     </message>
     <message>
         <source>Link-layer Header</source>
@@ -1204,15 +1212,15 @@
     </message>
     <message>
         <source>Promiscuous</source>
-        <translation type="unfinished">Смешанный</translation>
+        <translation>Смешанный</translation>
     </message>
     <message>
         <source>Snaplen (B)</source>
-        <translation type="unfinished">Длина снимка (Байт)</translation>
+        <translation>Длина снимка (Байт)</translation>
     </message>
     <message>
         <source>Buffer (MB)</source>
-        <translation type="unfinished">Буфер (МБайт)</translation>
+        <translation>Буфер (МБайт)</translation>
     </message>
     <message>
         <source>Monitor Mode</source>
@@ -1220,7 +1228,7 @@
     </message>
     <message>
         <source>Capture Filter</source>
-        <translation type="unfinished">Фильтр Захвата</translation>
+        <translation>Фильтр Захвата</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;You probably want to enable this. Usually a network card will only capture the traffic sent to its own network address. If you want to capture all traffic that the network card can &amp;quot;see&amp;quot;, mark this option. See the FAQ for some more details of capturing packets from a switched network.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -2301,32 +2309,20 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
         <translation type="unfinished">Тип</translation>
     </message>
     <message>
-        <source>Mac Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation type="unfinished">Имя</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished">Адрес</translation>
     </message>
     <message>
         <source>All entries</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IPv4 Hosts</source>
+        <source>Hosts</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IPv4 Hash Table</source>
-        <translation type="unfinished">Хэш-таблица IPv4</translation>
-    </message>
-    <message>
-        <source>IPv6 Hosts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IPv6 Hash Table</source>
-        <translation type="unfinished">Хэш-таблица IPv6</translation>
     </message>
     <message>
         <source>Ethernet Addresses</source>
@@ -2600,12 +2596,20 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
 <context>
     <name>ExtcapArgumentFileSelection</name>
     <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>All Files (</source>
         <translation>Все Файлы (</translation>
     </message>
     <message>
         <source>Open File</source>
         <translation>Открыть Файл</translation>
+    </message>
+    <message>
+        <source>Select File</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4134,6 +4138,10 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
         <translation>Сохранение %1</translation>
     </message>
     <message>
+        <source>Analyzing IAX2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save forward stream CSV</source>
         <translation>Сохранить прямой поток CSV</translation>
     </message>
@@ -4501,10 +4509,6 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
 <context>
     <name>InterfaceTreeModel</name>
     <message>
-        <source>No Interfaces found.</source>
-        <translation>Интерфейсы не найдены.</translation>
-    </message>
-    <message>
         <source>Show</source>
         <translation>Показать</translation>
     </message>
@@ -4515,6 +4519,14 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
     <message>
         <source>Interface Name</source>
         <translation>Имя Интерфейса</translation>
+    </message>
+    <message>
+        <source>No interfaces found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This version of Wireshark was built without packet capture support.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Local Pipe Path</source>
@@ -6635,10 +6647,6 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
         <translation>Игнорировать все показанные пакеты</translation>
     </message>
     <message>
-        <source>Unignore All Displayed</source>
-        <translation>Отменить Игнорирование Всех Показанных</translation>
-    </message>
-    <message>
         <source>Set/Unset Time Reference</source>
         <translation>Установить/Отменить Привязку По Времени</translation>
     </message>
@@ -7011,6 +7019,10 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
         <translation>Фильтровать эту Ассоциацию</translation>
     </message>
     <message>
+        <source>&amp;I/O Graphs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Conversations</source>
         <translation>&amp;Диалоги</translation>
     </message>
@@ -7215,6 +7227,14 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>U&amp;nignore All Displayed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unignore all displayed packets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Time Shift…</source>
         <translation>Временной Сдвиг…</translation>
     </message>
@@ -7253,10 +7273,6 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
     <message>
         <source>Export PDUs to File…</source>
         <translation>Экспортировать PDUхи в Файл…</translation>
-    </message>
-    <message>
-        <source>&amp;I/O Graph</source>
-        <translation>&amp;График Ввода/Вывода</translation>
     </message>
     <message>
         <source>Create graphs based on display filter fields</source>
@@ -7619,10 +7635,6 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
     <message>
         <source>&amp;Unmark All Displayed</source>
         <translation>&amp;Отменить пометку Всего Отображённого</translation>
-    </message>
-    <message>
-        <source>U&amp;nignore all displayed packets</source>
-        <translation>О&amp;тменить игнорирование всех показанных пакетов</translation>
     </message>
     <message>
         <source>All VoIP Calls</source>
@@ -8095,6 +8107,22 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
     <message>
         <source>Icons &amp; Text</source>
         <translation>Иконки &amp; Текст</translation>
+    </message>
+    <message>
+        <source>Window title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Custom window title to be appended to the existing title&lt;br/&gt;%F = file path of the capture file&lt;br/&gt;%P = profile name&lt;br/&gt;%S = a conditional separator (&amp;quot; - &amp;quot;) that only shows when surrounded by variables with values or static text&lt;br/&gt;%V = version info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prepend window title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Custom window title to be prepended to the existing title&lt;br/&gt;%F = file path of the capture file&lt;br/&gt;%P = profile name&lt;br/&gt;%S = a conditional separator (&amp;quot; - &amp;quot;) that only shows when surrounded by variables with values or static text&lt;br/&gt;%V = version info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Language: </source>
@@ -9074,6 +9102,10 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
     <message>
         <source>Frame</source>
         <translation>Кадр</translation>
+    </message>
+    <message>
+        <source>TextLabel</source>
+        <translation type="unfinished">Текстовая Метка</translation>
     </message>
 </context>
 <context>
@@ -10303,6 +10335,10 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
         <translation>Raw (*.raw)</translation>
     </message>
     <message>
+        <source>Analyzing RTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10412,7 +10448,7 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <source>Save forward stream CSV</source>
@@ -11733,6 +11769,10 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
         <translation>Не выбрано правильное пространство поиска. Пожалуйста, сообщите об этом команде разработчиков.</translation>
     </message>
     <message>
+        <source>Searching for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>No packet contained those bytes.</source>
         <translation>Нет пакета, содержащего эти байты.</translation>
     </message>
@@ -12347,8 +12387,12 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
 <context>
     <name>SyntaxLineEdit</name>
     <message>
-        <source>&quot;%1&quot; is deprecated or may have unexpected results. See the User&apos;s Guide.</source>
-        <translation>&quot;%1&quot; сомнителен или может иметь неожиданные результаты. Смотрите Руководство Пользователя.</translation>
+        <source>&quot;%1&quot; is deprecated in favour of &quot;%2&quot;. See the User&apos;s Guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;%1&quot; may have unexpected results. See the User&apos;s Guide.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

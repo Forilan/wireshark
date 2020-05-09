@@ -362,12 +362,12 @@ static const value_string ssl_20_cipher_suites[] = {
             */
 
     /* old numbers used in the beginning
-     * http://tools.ietf.org/html/draft-agl-tls-chacha20poly1305 */
+     * https://tools.ietf.org/html/draft-agl-tls-chacha20poly1305 */
     { 0x00CC13, "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256" },
     { 0x00CC14, "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256" },
     { 0x00CC15, "TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256" },
 
-    /* http://tools.ietf.org/html/draft-ietf-tls-chacha20-poly1305 */
+    /* https://tools.ietf.org/html/rfc7905 */
     { 0x00CCA8, "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256" },
     { 0x00CCA9, "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256" },
     { 0x00CCAA, "TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256" },
@@ -376,7 +376,7 @@ static const value_string ssl_20_cipher_suites[] = {
     { 0x00CCAD, "TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256" },
     { 0x00CCAE, "TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256" },
 
-    /* http://tools.ietf.org/html/draft-josefsson-salsa20-tls */
+    /* https://tools.ietf.org/html/draft-josefsson-salsa20-tls */
     { 0x00E410, "TLS_RSA_WITH_ESTREAM_SALSA20_SHA1" },
     { 0x00E411, "TLS_RSA_WITH_SALSA20_SHA1" },
     { 0x00E412, "TLS_ECDHE_RSA_WITH_ESTREAM_SALSA20_SHA1" },
@@ -460,22 +460,22 @@ const value_string ssl_extension_curves[] = {
     { 258, "ffdhe4096" }, /* RFC 7919 */
     { 259, "ffdhe6144" }, /* RFC 7919 */
     { 260, "ffdhe8192" }, /* RFC 7919 */
-    { 2570, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 6682, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 10794, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 14906, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 19018, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 23130, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 27242, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 31354, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 35466, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 39578, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 43690, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 47802, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 51914, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 56026, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 60138, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
-    { 64250, "Reserved (GREASE)" }, /* draft-ietf-tls-grease */
+    { 2570, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 6682, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 10794, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 14906, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 19018, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 23130, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 27242, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 31354, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 35466, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 39578, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 43690, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 47802, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 51914, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 56026, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 60138, "Reserved (GREASE)" }, /* RFC 8701 */
+    { 64250, "Reserved (GREASE)" }, /* RFC 8701 */
     { 0xFF01, "arbitrary_explicit_prime_curves" },
     { 0xFF02, "arbitrary_explicit_char2_curves" },
     { 0x00, NULL }
@@ -831,10 +831,13 @@ static const value_string ssl_31_ciphersuite[] = {
     { 0x00C3, "TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA256" },
     { 0x00C4, "TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256" },
     { 0x00C5, "TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256" },
-    /* 0x00,0xC6-FE Unassigned  */
+    /* draft-yang-tls-tls13-sm-suites */
+    { 0x00C6, "TLS_SM4_GCM_SM3" },
+    { 0x00C7, "TLS_SM4_CCM_SM3" },
+    /* 0x00,0xC8-FE Unassigned */
     /* From RFC 5746 */
     { 0x00FF, "TLS_EMPTY_RENEGOTIATION_INFO_SCSV" },
-    /* https://tools.ietf.org/html/draft-ietf-tls-grease */
+    /* RFC 8701 */
     { 0x0A0A, "Reserved (GREASE)" },
     /* RFC 8446 */
     { 0x1301, "TLS_AES_128_GCM_SHA256" },
@@ -842,14 +845,14 @@ static const value_string ssl_31_ciphersuite[] = {
     { 0x1303, "TLS_CHACHA20_POLY1305_SHA256" },
     { 0x1304, "TLS_AES_128_CCM_SHA256" },
     { 0x1305, "TLS_AES_128_CCM_8_SHA256" },
-    /* https://tools.ietf.org/html/draft-ietf-tls-grease */
+    /* RFC 8701 */
     { 0x1A1A, "Reserved (GREASE)" },
     { 0x2A2A, "Reserved (GREASE)" },
     { 0x3A3A, "Reserved (GREASE)" },
     { 0x4A4A, "Reserved (GREASE)" },
     /* From RFC 7507 */
     { 0x5600, "TLS_FALLBACK_SCSV" },
-    /* https://tools.ietf.org/html/draft-ietf-tls-grease */
+    /* RFC 8701 */
     { 0x5A5A, "Reserved (GREASE)" },
     { 0x6A6A, "Reserved (GREASE)" },
     { 0x7A7A, "Reserved (GREASE)" },
@@ -1040,13 +1043,26 @@ static const value_string ssl_31_ciphersuite[] = {
     { 0xC0AD, "TLS_ECDHE_ECDSA_WITH_AES_256_CCM" },
     { 0xC0AE, "TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8" },
     { 0xC0AF, "TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8" },
+    /* RFC 8492 */
+    { 0xC0B0, "TLS_ECCPWD_WITH_AES_128_GCM_SHA256" },
+    { 0xC0B1, "TLS_ECCPWD_WITH_AES_256_GCM_SHA384" },
+    { 0xC0B2, "TLS_ECCPWD_WITH_AES_128_CCM_SHA256" },
+    { 0xC0B3, "TLS_ECCPWD_WITH_AES_256_CCM_SHA384" },
+    /* draft-camwinget-tls-ts13-macciphersuites */
+    { 0xC0B4, "TLS_SHA256_SHA256" },
+    { 0xC0B5, "TLS_SHA384_SHA384" },
     /* https://www.ietf.org/archive/id/draft-cragie-tls-ecjpake-01.txt */
     { 0xC0FF, "TLS_ECJPAKE_WITH_AES_128_CCM_8" },
     /* draft-smyshlyaev-tls12-gost-suites */
     { 0xC100, "TLS_GOSTR341112_256_WITH_KUZNYECHIK_CTR_OMAC" },
     { 0xC101, "TLS_GOSTR341112_256_WITH_MAGMA_CTR_OMAC" },
     { 0xC102, "TLS_GOSTR341112_256_WITH_28147_CNT_IMIT" },
-    /* https://tools.ietf.org/html/draft-ietf-tls-grease */
+    /* draft-smyshlyaev-tls13-gost-suites */
+    { 0xC103, "TLS_GOSTR341112_256_WITH_KUZNYECHIK_MGM_L" },
+    { 0xC104, "TLS_GOSTR341112_256_WITH_MAGMA_MGM_L" },
+    { 0xC105, "TLS_GOSTR341112_256_WITH_KUZNYECHIK_MGM_S" },
+    { 0xC106, "TLS_GOSTR341112_256_WITH_MAGMA_MGM_S" },
+    /* RFC 8701 */
     { 0xCACA, "Reserved (GREASE)" },
 /*
 0xC0,0xAB-FF Unassigned
@@ -1056,7 +1072,7 @@ static const value_string ssl_31_ciphersuite[] = {
 0xFF,0x00-FF Reserved for Private Use [RFC5246]
 */
     /* old numbers used in the beginning
-     * http://tools.ietf.org/html/draft-agl-tls-chacha20poly1305 */
+     * https://tools.ietf.org/html/draft-agl-tls-chacha20poly1305 */
     { 0xCC13, "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256" },
     { 0xCC14, "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256" },
     { 0xCC15, "TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256" },
@@ -1073,9 +1089,9 @@ static const value_string ssl_31_ciphersuite[] = {
     { 0xD002, "TLS_ECDHE_PSK_WITH_AES_256_GCM_SHA384" },
     { 0xD003, "TLS_ECDHE_PSK_WITH_AES_128_CCM_8_SHA256" },
     { 0xD005, "TLS_ECDHE_PSK_WITH_AES_128_CCM_SHA256" },
-    /* https://tools.ietf.org/html/draft-ietf-tls-grease */
+    /* RFC 8701 */
     { 0xDADA, "Reserved (GREASE)" },
-    /* http://tools.ietf.org/html/draft-josefsson-salsa20-tls */
+    /* https://tools.ietf.org/html/draft-josefsson-salsa20-tls */
     { 0xE410, "TLS_RSA_WITH_ESTREAM_SALSA20_SHA1" },
     { 0xE411, "TLS_RSA_WITH_SALSA20_SHA1" },
     { 0xE412, "TLS_ECDHE_RSA_WITH_ESTREAM_SALSA20_SHA1" },
@@ -1092,7 +1108,7 @@ static const value_string ssl_31_ciphersuite[] = {
     { 0xE41D, "TLS_DHE_PSK_WITH_SALSA20_SHA1" },
     { 0xE41E, "TLS_DHE_RSA_WITH_ESTREAM_SALSA20_SHA1" },
     { 0xE41F, "TLS_DHE_RSA_WITH_SALSA20_SHA1" },
-    /* https://tools.ietf.org/html/draft-ietf-tls-grease */
+    /* RFC 8701 */
     { 0xEAEA, "Reserved (GREASE)" },
     { 0xFAFA, "Reserved (GREASE)" },
     /* these from http://www.mozilla.org/projects/
@@ -1100,7 +1116,7 @@ static const value_string ssl_31_ciphersuite[] = {
     { 0xfefe, "SSL_RSA_FIPS_WITH_DES_CBC_SHA"},
     { 0xfeff, "SSL_RSA_FIPS_WITH_3DES_EDE_CBC_SHA" },
     { 0xffe0, "SSL_RSA_FIPS_WITH_3DES_EDE_CBC_SHA" },
-    { 0xffe1, "SSL_RSA_FIPS_WITH_DES_CBC_SHA"},
+    { 0xffe1, "SSL_RSA_FIPS_WITH_DES_CBC_SHA" },
     /* note that ciphersuites 0xff00 - 0xffff are private */
     { 0x00, NULL }
 };
@@ -1150,28 +1166,28 @@ const value_string tls_hello_extension_types[] = {
     { SSL_HND_HELLO_EXT_POST_HANDSHAKE_AUTH, "post_handshake_auth" }, /* RFC 8446 */
     { SSL_HND_HELLO_EXT_SIGNATURE_ALGORITHMS_CERT, "signature_algorithms_cert" }, /* RFC 8446 */
     { SSL_HND_HELLO_EXT_KEY_SHARE, "key_share" }, /* RFC 8446 */
-    { SSL_HND_HELLO_EXT_GREASE_0A0A, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_1A1A, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_2A2A, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
+    { SSL_HND_HELLO_EXT_GREASE_0A0A, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_1A1A, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_2A2A, "Reserved (GREASE)" }, /* RFC 8701 */
     { SSL_HND_HELLO_EXT_NPN, "next_protocol_negotiation"}, /* https://tools.ietf.org/id/draft-agl-tls-nextprotoneg-03.html */
-    { SSL_HND_HELLO_EXT_GREASE_3A3A, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_4A4A, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_5A5A, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_6A6A, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_CHANNEL_ID_OLD, "channel_id_old" }, /* http://tools.ietf.org/html/draft-balfanz-tls-channelid-00
+    { SSL_HND_HELLO_EXT_GREASE_3A3A, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_4A4A, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_5A5A, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_6A6A, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_CHANNEL_ID_OLD, "channel_id_old" }, /* https://tools.ietf.org/html/draft-balfanz-tls-channelid-00
        https://twitter.com/ericlaw/status/274237352531083264 */
-    { SSL_HND_HELLO_EXT_CHANNEL_ID, "channel_id" }, /* http://tools.ietf.org/html/draft-balfanz-tls-channelid-01
+    { SSL_HND_HELLO_EXT_CHANNEL_ID, "channel_id" }, /* https://tools.ietf.org/html/draft-balfanz-tls-channelid-01
        https://code.google.com/p/chromium/codesearch#chromium/src/net/third_party/nss/ssl/sslt.h&l=209 */
     { SSL_HND_HELLO_EXT_RENEGOTIATION_INFO, "renegotiation_info" }, /* RFC 5746 */
-    { SSL_HND_HELLO_EXT_GREASE_7A7A, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_8A8A, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_9A9A, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_AAAA, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_BABA, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_CACA, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_DADA, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_EAEA, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
-    { SSL_HND_HELLO_EXT_GREASE_FAFA, "Reserved (GREASE)" }, /* https://tools.ietf.org/html/draft-ietf-tls-grease */
+    { SSL_HND_HELLO_EXT_GREASE_7A7A, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_8A8A, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_9A9A, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_AAAA, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_BABA, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_CACA, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_DADA, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_EAEA, "Reserved (GREASE)" }, /* RFC 8701 */
+    { SSL_HND_HELLO_EXT_GREASE_FAFA, "Reserved (GREASE)" }, /* RFC 8701 */
     { SSL_HND_HELLO_EXT_QUIC_TRANSPORT_PARAMETERS, "quic_transports_parameters" }, /* https://tools.ietf.org/html/draft-ietf-quic-tls */
     { SSL_HND_HELLO_EXT_ENCRYPTED_SERVER_NAME, "encrypted_server_name" }, /* https://tools.ietf.org/html/draft-ietf-tls-esni-01 */
     { 0, NULL }
@@ -1569,21 +1585,27 @@ const value_string quic_transport_parameter_id[] = {
     { SSL_HND_QUIC_TP_ACTIVE_CONNECTION_ID_LIMIT, "active_connection_id_limit" },
     { SSL_HND_QUIC_TP_MAX_DATAGRAM_FRAME_SIZE, "max_datagram_frame_size" },
     { SSL_HND_QUIC_TP_LOSS_BITS, "loss_bits" },
+    { SSL_HND_QUIC_TP_ENABLE_TIME_STAMP, "enable_time_stamp" },
+    { SSL_HND_QUIC_TP_MIN_ACK_DELAY, "min_ack_delay" },
     { 0, NULL }
 };
 
 /* Lookup tables }}} */
 
 void
-quic_transport_parameter_id_base_custom(gchar *result, guint32 parameter_id)
+quic_transport_parameter_id_base_custom(gchar *result, guint64 parameter_id)
 {
-
-    /* GREASE ? https://tools.ietf.org/html/draft-ietf-quic-transport-23#section-18.1 */
-    if ( ( (parameter_id - 27) % 31) == 0 ) {
-        g_snprintf(result, ITEM_LABEL_LENGTH, "GREASE (0x%04x)", parameter_id);
+    const char *label;
+    /* GREASE? https://tools.ietf.org/html/draft-ietf-quic-transport-27#section-18.1 */
+    if (((parameter_id - 27) % 31) == 0) {
+        label = "GREASE";
+    } else if (parameter_id > 0xffffffff) {
+        // There are no 64-bit Parameter IDs at the moment.
+        label = "Unknown";
     } else {
-        g_snprintf(result, ITEM_LABEL_LENGTH, "%s (0x%04x)", val_to_str_const(parameter_id, quic_transport_parameter_id, "Unknown"), parameter_id);
+        label = val_to_str_const((guint32)parameter_id, quic_transport_parameter_id, "Unknown");
     }
+    g_snprintf(result, ITEM_LABEL_LENGTH, "%s (0x%02" G_GINT64_MODIFIER "x)", label, parameter_id);
 }
 
 /* we keep this internal to packet-tls-utils, as there should be
@@ -3012,7 +3034,7 @@ ssl_create_decompressor(gint compression)
 
     if (compression == 0) return NULL;
     ssl_debug_printf("ssl_create_decompressor: compression method %d\n", compression);
-    decomp = (SslDecompress *)wmem_alloc(wmem_file_scope(), sizeof(SslDecompress));
+    decomp = wmem_new(wmem_file_scope(), SslDecompress);
     decomp->compression = compression;
     switch (decomp->compression) {
 #ifdef HAVE_ZLIB
@@ -3090,7 +3112,7 @@ ssl_create_flow(void)
 {
   SslFlow *flow;
 
-  flow = (SslFlow *)wmem_alloc(wmem_file_scope(), sizeof(SslFlow));
+  flow = wmem_new(wmem_file_scope(), SslFlow);
   flow->byte_seq = 0;
   flow->flags = 0;
   flow->multisegment_pdus = wmem_tree_new(wmem_file_scope());
@@ -3102,13 +3124,13 @@ ssl_create_flow(void)
 void
 ssl_change_cipher(SslDecryptSession *ssl_session, gboolean server)
 {
-    ssl_debug_printf("ssl_change_cipher %s\n", (server)?"SERVER":"CLIENT");
-    if (server) {
-        ssl_session->server = ssl_session->server_new;
-        ssl_session->server_new = NULL;
-    } else {
-        ssl_session->client = ssl_session->client_new;
-        ssl_session->client_new = NULL;
+    SslDecoder **new_decoder = server ? &ssl_session->server_new : &ssl_session->client_new;
+    SslDecoder **dest = server ? &ssl_session->server : &ssl_session->client;
+    ssl_debug_printf("ssl_change_cipher %s%s\n", server ? "SERVER" : "CLIENT",
+            *new_decoder ? "" : " (No decoder found - retransmission?)");
+    if (*new_decoder) {
+        *dest = *new_decoder;
+        *new_decoder = NULL;
     }
 }
 /* }}} */
@@ -3124,7 +3146,7 @@ ssl_create_decoder(const SslCipherSuite *cipher_suite, gint cipher_algo,
     SslDecoder *dec;
     ssl_cipher_mode_t mode = cipher_suite->mode;
 
-    dec = (SslDecoder *)wmem_alloc0(wmem_file_scope(), sizeof(SslDecoder));
+    dec = wmem_new0(wmem_file_scope(), SslDecoder);
     /* init mac buffer: mac storage is embedded into decoder struct to save a
      memory allocation and waste samo more memory*/
     dec->cipher_suite=cipher_suite;
@@ -6006,7 +6028,7 @@ tls_dissect_certificate_authorities(ssl_common_dissect_t *hf, tvbuff_t *tvb, pac
     proto_tree *subtree;
     guint32     dnames_length, next_offset;
     asn1_ctx_t  asn1_ctx;
-
+    int         dnames_count = 100; /* the maximum number of DNs to add to the tree */
 
     /* Note: minimum length is 0 for TLS 1.1/1.2 and 3 for earlier/later */
     /* DistinguishedName certificate_authorities<0..2^16-1> */
@@ -6031,6 +6053,19 @@ tls_dissect_certificate_authorities(ssl_common_dissect_t *hf, tvbuff_t *tvb, pac
         while (offset < next_offset) {
             /* get the length of the current certificate */
             guint32 name_length;
+
+            if (dnames_count-- == 0) {
+                /* stop adding to tree when the list is considered too large
+                 * https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=16202
+                   Note: dnames_count must be set low enough not to hit the
+                   limit set by PINFO_LAYER_MAX_RECURSION_DEPTH in packet.c
+                 */
+                ti = proto_tree_add_item(subtree, hf->hf.hs_dnames_truncated,
+                    tvb, offset, next_offset - offset, ENC_NA);
+                proto_item_set_generated(ti);
+                return next_offset;
+            }
+
             /* opaque DistinguishedName<1..2^16-1> */
             if (!ssl_add_vector(hf, tvb, pinfo, subtree, offset, next_offset, &name_length,
                                 hf->hf.hs_dname_len, 1, G_MAXUINT16)) {
@@ -6776,7 +6811,8 @@ ssl_dissect_hnd_hello_ext_quic_transport_parameters(ssl_common_dissect_t *hf, tv
                                                     proto_tree *tree, guint32 offset, guint32 offset_end,
                                                     guint8 hnd_type _U_, SslDecryptSession *ssl _U_)
 {
-    guint32 quic_length, parameter_length, next_offset;
+    gboolean use_varint_encoding = TRUE;    // Whether this is draft -27 or newer.
+    guint32 next_offset;
 
     /* https://tools.ietf.org/html/draft-ietf-quic-transport-25#section-18
      *
@@ -6786,9 +6822,8 @@ ssl_dissect_hnd_hello_ext_quic_transport_parameters(ssl_common_dissect_t *hf, tv
      *   struct {
      *     uint16 id;
      *     opaque value<0..2^16-1>;
-     *  } TransportParameter;
-     *
-     *  TransportParameter TransportParameters<0..2^16-1>;
+     *  } TransportParameter;                               // before draft -27
+     *  TransportParameter TransportParameters<0..2^16-1>;  // before draft -27
      *
      *  struct {
      *    opaque ipv4Address[4];
@@ -6800,16 +6835,31 @@ ssl_dissect_hnd_hello_ext_quic_transport_parameters(ssl_common_dissect_t *hf, tv
      *  } PreferredAddress;
      */
 
-    /* TransportParameter TransportParameters<0..2^16-1>; */
-    if (!ssl_add_vector(hf, tvb, pinfo, tree, offset, offset_end, &quic_length,
-                        hf->hf.hs_ext_quictp_len, 0, G_MAXUINT16)) {
-        return offset_end;
+    if (offset_end - offset >= 6 &&
+            2 + (guint)tvb_get_ntohs(tvb, offset) == offset_end - offset &&
+            6 + (guint)tvb_get_ntohs(tvb, offset + 4) <= offset_end - offset) {
+        // Assume encoding of Transport Parameters draft -26 or older with at
+        // least one transport parameter that has a valid length.
+        use_varint_encoding = FALSE;
     }
-    offset += 2;
-    next_offset = offset + quic_length;
+
+    if (use_varint_encoding) {
+        next_offset = offset_end;
+    } else {
+        guint32 quic_length;
+        // Assume draft -26 or earlier.
+        /* TransportParameter TransportParameters<0..2^16-1>; */
+        if (!ssl_add_vector(hf, tvb, pinfo, tree, offset, offset_end, &quic_length,
+                            hf->hf.hs_ext_quictp_len, 0, G_MAXUINT16)) {
+            return offset_end;
+        }
+        offset += 2;
+        next_offset = offset + quic_length;
+    }
 
     while (offset < next_offset) {
         guint32 parameter_type;
+        guint32 parameter_length;
         proto_tree *parameter_tree;
         guint32 parameter_end_offset;
         guint64 value;
@@ -6817,26 +6867,46 @@ ssl_dissect_hnd_hello_ext_quic_transport_parameters(ssl_common_dissect_t *hf, tv
 
         parameter_tree = proto_tree_add_subtree(tree, tvb, offset, 4, hf->ett.hs_ext_quictp_parameter,
                                                 NULL, "Parameter");
-        /* TransportParameter ID */
-        proto_tree_add_item_ret_uint(parameter_tree, hf->hf.hs_ext_quictp_parameter_type,
-                                     tvb, offset, 2, ENC_BIG_ENDIAN, &parameter_type);
-        offset += 2;
+        /* TransportParameter ID and Length. */
+        if (use_varint_encoding) {
+            guint64 parameter_type64, parameter_length64;
+            guint32 type_len = 0;
 
-        /* GREASE ? https://tools.ietf.org/html/draft-ietf-quic-transport-23#section-18.1 */
-        if ( ( (parameter_type - 27) % 31) == 0 ) {
+            proto_tree_add_item_ret_varint(parameter_tree, hf->hf.hs_ext_quictp_parameter_type,
+                                           tvb, offset, -1, ENC_VARINT_QUIC, &parameter_type64, &type_len);
+            parameter_type = (guint32)parameter_type64;
+            offset += type_len;
+
+            proto_tree_add_item_ret_varint(parameter_tree, hf->hf.hs_ext_quictp_parameter_len,
+                                           tvb, offset, -1, ENC_VARINT_QUIC, &parameter_length64, &len);
+            parameter_length = (guint32)parameter_length64;
+            offset += len;
+
+            proto_item_set_len(parameter_tree, type_len + len + parameter_length);
+        } else {
+            parameter_type = tvb_get_ntohs(tvb, offset);
+            proto_tree_add_item(parameter_tree, hf->hf.hs_ext_quictp_parameter_type,
+                                tvb, offset, 2, ENC_BIG_ENDIAN);
+            offset += 2;
+
+            /* opaque value<0..2^16-1> */
+            if (!ssl_add_vector(hf, tvb, pinfo, parameter_tree, offset, next_offset, &parameter_length,
+                                hf->hf.hs_ext_quictp_parameter_len_old, 0, G_MAXUINT16)) {
+                return next_offset;
+            }
+            offset += 2;
+
+            proto_item_set_len(parameter_tree, 4 + parameter_length);
+        }
+
+        /* GREASE? https://tools.ietf.org/html/draft-ietf-quic-transport-27#section-18.1 */
+        if (((parameter_type - 27) % 31) == 0) {
             proto_item_append_text(parameter_tree, ": GREASE");
         } else {
             proto_item_append_text(parameter_tree, ": %s", val_to_str(parameter_type, quic_transport_parameter_id, "Unknown"));
         }
 
-        /* opaque value<0..2^16-1> */
-        if (!ssl_add_vector(hf, tvb, pinfo, parameter_tree, offset, next_offset, &parameter_length,
-                            hf->hf.hs_ext_quictp_parameter_len, 0, G_MAXUINT16)) {
-            return next_offset;
-        }
-        offset += 2;
         proto_item_append_text(parameter_tree, " (len=%u)", parameter_length);
-        proto_item_set_len(parameter_tree, 4 + parameter_length);
         parameter_end_offset = offset + parameter_length;
 
         proto_tree_add_item(parameter_tree, hf->hf.hs_ext_quictp_parameter_value,
@@ -6964,6 +7034,15 @@ ssl_dissect_hnd_hello_ext_quic_transport_parameters(ssl_common_dissect_t *hf, tv
                 proto_tree_add_item(parameter_tree, hf->hf.hs_ext_quictp_parameter_loss_bits,
                                     tvb, offset, 1, ENC_BIG_ENDIAN);
                 offset += 1;
+            break;
+            case SSL_HND_QUIC_TP_MIN_ACK_DELAY:
+                proto_tree_add_item_ret_varint(parameter_tree, hf->hf.hs_ext_quictp_parameter_min_ack_delay,
+                                               tvb, offset, -1, ENC_VARINT_QUIC, &value, &len);
+                proto_item_append_text(parameter_tree, " %" G_GINT64_MODIFIER "u", value);
+                offset += len;
+            break;
+            case SSL_HND_QUIC_TP_ENABLE_TIME_STAMP:
+                /* No Payload */
             break;
             default:
                 offset += parameter_length;
@@ -8807,6 +8886,64 @@ dissect_ssl3_hnd_cli_keyex_rsa_psk(ssl_common_dissect_t *hf, tvbuff_t *tvb,
     proto_tree_add_item(ssl_psk_tree, hf->hf.hs_client_keyex_epms, tvb,
                         offset + 2, epms_len, ENC_NA);
 }
+
+/* Used in EC J-PAKE cipher suites */
+static void
+dissect_ssl3_hnd_cli_keyex_ecjpake(ssl_common_dissect_t *hf, tvbuff_t *tvb,
+                                   proto_tree *tree, guint32 offset,
+                                   guint32 length)
+{
+    /*
+     *  struct {
+     *      ECPoint V;
+     *      opaque r<1..2^8-1>;
+     *  } ECSchnorrZKP;
+     *
+     *  struct {
+     *      ECPoint X;
+     *      ECSchnorrZKP zkp;
+     *  } ECJPAKEKeyKP;
+     *
+     *  struct {
+     *      ECJPAKEKeyKP ecjpake_key_kp;
+     *  } ClientECJPAKEParams;
+     *
+     *  select (KeyExchangeAlgorithm) {
+     *      case ecjpake:
+     *          ClientECJPAKEParams params;
+     *  } ClientKeyExchange;
+     */
+
+    gint        point_len;
+    proto_tree *ssl_ecjpake_tree;
+
+    ssl_ecjpake_tree = proto_tree_add_subtree(tree, tvb, offset, length,
+                                              hf->ett.keyex_params, NULL,
+                                              "EC J-PAKE Client Params");
+
+    /* ECJPAKEKeyKP.X */
+    point_len = tvb_get_guint8(tvb, offset);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_client_keyex_xc_len, tvb,
+                        offset, 1, ENC_BIG_ENDIAN);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_client_keyex_xc, tvb,
+                        offset + 1, point_len, ENC_NA);
+    offset += 1 + point_len;
+
+    /* ECJPAKEKeyKP.zkp.V */
+    point_len = tvb_get_guint8(tvb, offset);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_client_keyex_vc_len, tvb,
+                        offset, 1, ENC_BIG_ENDIAN);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_client_keyex_vc, tvb,
+                        offset + 1, point_len, ENC_NA);
+    offset += 1 + point_len;
+
+    /* ECJPAKEKeyKP.zkp.r */
+    point_len = tvb_get_guint8(tvb, offset);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_client_keyex_rc_len, tvb,
+                        offset, 1, ENC_BIG_ENDIAN);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_client_keyex_rc, tvb,
+                        offset + 1, point_len, ENC_NA);
+}
 /* ClientKeyExchange algo-specific dissectors. }}} */
 
 
@@ -8868,10 +9005,8 @@ dissect_ssl3_hnd_srv_keyex_sig(ssl_common_dissect_t *hf, tvbuff_t *tvb, packet_i
                                  hf->hf.hs_server_keyex_sig);
 }
 
-static void
-dissect_ssl3_hnd_srv_keyex_ecdh(ssl_common_dissect_t *hf, tvbuff_t *tvb, packet_info *pinfo,
-                                proto_tree *tree, guint32 offset, guint32 offset_end,
-                                guint16 version, gboolean anon)
+static guint32
+dissect_tls_ecparameters(ssl_common_dissect_t *hf, tvbuff_t *tvb, proto_tree *tree, guint32 offset, guint32 offset_end)
 {
     /*
      * RFC 4492 ECC cipher suites for TLS
@@ -8887,6 +9022,34 @@ dissect_ssl3_hnd_srv_keyex_ecdh(ssl_common_dissect_t *hf, tvbuff_t *tvb, packet_
      *              NamedCurve namedcurve;
      *      };
      *  } ECParameters;
+     */
+
+    gint        curve_type;
+
+    /* ECParameters.curve_type */
+    curve_type = tvb_get_guint8(tvb, offset);
+    proto_tree_add_item(tree, hf->hf.hs_server_keyex_curve_type, tvb,
+                        offset, 1, ENC_BIG_ENDIAN);
+    offset++;
+
+    if (curve_type != 3)
+        return offset_end; /* only named_curves are supported */
+
+    /* case curve_type == named_curve; ECParameters.namedcurve */
+    proto_tree_add_item(tree, hf->hf.hs_server_keyex_named_curve, tvb,
+                        offset, 2, ENC_BIG_ENDIAN);
+    offset += 2;
+
+    return offset;
+}
+
+static void
+dissect_ssl3_hnd_srv_keyex_ecdh(ssl_common_dissect_t *hf, tvbuff_t *tvb, packet_info *pinfo,
+                                proto_tree *tree, guint32 offset, guint32 offset_end,
+                                guint16 version, gboolean anon)
+{
+    /*
+     * RFC 4492 ECC cipher suites for TLS
      *
      *  struct {
      *      opaque point <1..2^8-1>;
@@ -8904,25 +9067,15 @@ dissect_ssl3_hnd_srv_keyex_ecdh(ssl_common_dissect_t *hf, tvbuff_t *tvb, packet_
      *  } ServerKeyExchange;
      */
 
-    gint        curve_type;
     gint        point_len;
     proto_tree *ssl_ecdh_tree;
 
     ssl_ecdh_tree = proto_tree_add_subtree(tree, tvb, offset, offset_end - offset,
                                   hf->ett.keyex_params, NULL, "EC Diffie-Hellman Server Params");
 
-    /* ECParameters.curve_type */
-    curve_type = tvb_get_guint8(tvb, offset);
-    proto_tree_add_item(ssl_ecdh_tree, hf->hf.hs_server_keyex_curve_type, tvb,
-                        offset, 1, ENC_BIG_ENDIAN);
-    offset++;
-    if (curve_type != 3)
+    offset = dissect_tls_ecparameters(hf, tvb, ssl_ecdh_tree, offset, offset_end);
+    if (offset >= offset_end)
         return; /* only named_curves are supported */
-
-    /* case curve_type == named_curve; ECParameters.namedcurve */
-    proto_tree_add_item(ssl_ecdh_tree, hf->hf.hs_server_keyex_named_curve, tvb,
-                        offset, 2, ENC_BIG_ENDIAN);
-    offset += 2;
 
     /* ECPoint.point */
     point_len = tvb_get_guint8(tvb, offset);
@@ -9034,6 +9187,68 @@ dissect_ssl3_hnd_srv_keyex_psk(ssl_common_dissect_t *hf, tvbuff_t *tvb,
     proto_tree_add_item(ssl_psk_tree, hf->hf.hs_server_keyex_hint, tvb,
                         offset + 2, hint_len, ENC_NA);
 }
+
+/* Used in EC J-PAKE cipher suites */
+static void
+dissect_ssl3_hnd_srv_keyex_ecjpake(ssl_common_dissect_t *hf, tvbuff_t *tvb,
+                                   proto_tree *tree, guint32 offset, guint32 offset_end)
+{
+    /*
+     *  struct {
+     *      ECPoint V;
+     *      opaque r<1..2^8-1>;
+     *  } ECSchnorrZKP;
+     *
+     *  struct {
+     *      ECPoint X;
+     *      ECSchnorrZKP zkp;
+     *  } ECJPAKEKeyKP;
+     *
+     *  struct {
+     *      ECParameters curve_params;
+     *      ECJPAKEKeyKP ecjpake_key_kp;
+     *  } ServerECJPAKEParams;
+     *
+     *  select (KeyExchangeAlgorithm) {
+     *      case ecjpake:
+     *          ServerECJPAKEParams params;
+     *  } ServerKeyExchange;
+     */
+
+    gint        point_len;
+    proto_tree *ssl_ecjpake_tree;
+
+    ssl_ecjpake_tree = proto_tree_add_subtree(tree, tvb, offset, offset_end - offset,
+                                              hf->ett.keyex_params, NULL,
+                                              "EC J-PAKE Server Params");
+
+    offset = dissect_tls_ecparameters(hf, tvb, ssl_ecjpake_tree, offset, offset_end);
+    if (offset >= offset_end)
+        return; /* only named_curves are supported */
+
+    /* ECJPAKEKeyKP.X */
+    point_len = tvb_get_guint8(tvb, offset);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_server_keyex_xs_len, tvb,
+                        offset, 1, ENC_BIG_ENDIAN);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_server_keyex_xs, tvb,
+                        offset + 1, point_len, ENC_NA);
+    offset += 1 + point_len;
+
+    /* ECJPAKEKeyKP.zkp.V */
+    point_len = tvb_get_guint8(tvb, offset);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_server_keyex_vs_len, tvb,
+                        offset, 1, ENC_BIG_ENDIAN);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_server_keyex_vs, tvb,
+                        offset + 1, point_len, ENC_NA);
+    offset += 1 + point_len;
+
+    /* ECJPAKEKeyKP.zkp.r */
+    point_len = tvb_get_guint8(tvb, offset);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_server_keyex_rs_len, tvb,
+                        offset, 1, ENC_BIG_ENDIAN);
+    proto_tree_add_item(ssl_ecjpake_tree, hf->hf.hs_server_keyex_rs, tvb,
+                        offset + 1, point_len, ENC_NA);
+}
 /* ServerKeyExchange algo-specific dissectors. }}} */
 
 /* Client Key Exchange and Server Key Exchange handshake dissections. {{{ */
@@ -9080,8 +9295,8 @@ ssl_dissect_hnd_cli_keyex(ssl_common_dissect_t *hf, tvbuff_t *tvb,
     case KEX_SRP_SHA_RSA:
         /* XXX: implement support for SRP_SHA* */
         break;
-    case KEX_ECJPAKE: /* https://datatracker.ietf.org/doc/draft-cragie-tls-ecjpake/ used in Thread Commissioning */
-        /* XXX: implement support for ECJPAKE */
+    case KEX_ECJPAKE: /* https://tools.ietf.org/html/draft-cragie-tls-ecjpake-01 used in Thread Commissioning */
+        dissect_ssl3_hnd_cli_keyex_ecjpake(hf, tvb, tree, offset, length);
         break;
     default:
         /* XXX: add info message for not supported KEX algo */
@@ -9136,8 +9351,8 @@ ssl_dissect_hnd_srv_keyex(ssl_common_dissect_t *hf, tvbuff_t *tvb, packet_info *
     case KEX_SRP_SHA_RSA:
         /* XXX: implement support for SRP_SHA* */
         break;
-    case KEX_ECJPAKE: /* https://datatracker.ietf.org/doc/draft-cragie-tls-ecjpake/ used in Thread Commissioning */
-        /* XXX: implement support for ECJPAKE */
+    case KEX_ECJPAKE: /* https://tools.ietf.org/html/draft-cragie-tls-ecjpake-01 used in Thread Commissioning */
+        dissect_ssl3_hnd_srv_keyex_ecjpake(hf, tvb, tree, offset, offset_end);
         break;
     default:
         /* XXX: add info message for not supported KEX algo */

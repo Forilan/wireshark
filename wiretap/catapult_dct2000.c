@@ -198,8 +198,7 @@ catapult_dct2000_open(wtap *wth, int *err, gchar **err_info)
     /* Need entry in file_externals table                                */
 
     /* Allocate a new file_externals structure for this file */
-    file_externals = g_new(dct2000_file_externals_t,1);
-    memset((void*)file_externals, '\0', sizeof(dct2000_file_externals_t));
+    file_externals = g_new0(dct2000_file_externals_t, 1);
 
     /* Copy this first line into buffer so could write out later */
     g_strlcpy(file_externals->firstline, linebuff, firstline_length+1);
@@ -951,7 +950,6 @@ parse_line(gchar *linebuff, gint line_length,
 
 
         /* Outheader values may follow */
-        outhdr_name[0] = '\0';
         if (linebuff[n] == ',') {
             /* Skip , */
             n++;
@@ -986,9 +984,9 @@ parse_line(gchar *linebuff, gint line_length,
 
         *encap = WTAP_ENCAP_RAW_IP;
     }
-    else
 
     /* FP may be carried over ATM, which has separate atm header to parse */
+    else
     if ((strcmp(protocol_name, "fp") == 0) ||
         (strncmp(protocol_name, "fp_r", 4) == 0)) {
 

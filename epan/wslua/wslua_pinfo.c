@@ -21,7 +21,7 @@
 #include <string.h>
 
 
-/* WSLUA_MODULE Pinfo Obtaining packet information */
+/* WSLUA_MODULE Pinfo Obtaining Packet Information */
 
 
 /*
@@ -264,7 +264,7 @@ PINFO_NAMED_NUMBER_GETTER(port_type,ptype);
 PINFO_NAMED_NUMBER_GETTER(src_port,srcport);
 PINFO_NAMED_NUMBER_SETTER(src_port,srcport,guint32);
 
-/* WSLUA_ATTRIBUTE Pinfo_dst_port RW Source Address of this Packet. */
+/* WSLUA_ATTRIBUTE Pinfo_dst_port RW Destination Port of this Packet. */
 PINFO_NAMED_NUMBER_GETTER(dst_port,destport);
 PINFO_NAMED_NUMBER_SETTER(dst_port,destport,guint32);
 
@@ -397,7 +397,7 @@ static int Pinfo_set_conversation(lua_State *L) {
     conversation_t  *conversation;
 
     if (!proto->handle) {
-        luaL_error(L,"Proto %s has no registered dissector", proto->name? proto->name:"<UKNOWN>");
+        luaL_error(L,"Proto %s has no registered dissector", proto->name? proto->name:"<UNKNOWN>");
         return 0;
     }
 

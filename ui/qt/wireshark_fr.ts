@@ -969,6 +969,10 @@
         <translation>Temps écoulé</translation>
     </message>
     <message>
+        <source>Section %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Capture</source>
         <translation>Capture</translation>
     </message>
@@ -1065,8 +1069,12 @@
         <translation>Débit moyen (bits/s)</translation>
     </message>
     <message>
+        <source>Section Comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>File Comment</source>
-        <translation>Commentaire du Fichier</translation>
+        <translation type="vanished">Commentaire du Fichier</translation>
     </message>
     <message>
         <source>Packet Comments</source>
@@ -2269,32 +2277,20 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
         <translation type="unfinished">Type</translation>
     </message>
     <message>
-        <source>Mac Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation type="unfinished">Nom</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished">Adresse</translation>
     </message>
     <message>
         <source>All entries</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IPv4 Hosts</source>
+        <source>Hosts</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IPv4 Hash Table</source>
-        <translation type="unfinished">Table Hash IPv4</translation>
-    </message>
-    <message>
-        <source>IPv6 Hosts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IPv6 Hash Table</source>
-        <translation type="unfinished">Table Hash IPv6</translation>
     </message>
     <message>
         <source>Ethernet Addresses</source>
@@ -2568,12 +2564,20 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
 <context>
     <name>ExtcapArgumentFileSelection</name>
     <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>All Files (</source>
         <translation>Tous les Fichiers (</translation>
     </message>
     <message>
         <source>Open File</source>
         <translation>Ouvrir un fichier</translation>
+    </message>
+    <message>
+        <source>Select File</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4096,6 +4100,10 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
         <translation>Sauvegarde en cours %1</translation>
     </message>
     <message>
+        <source>Analyzing IAX2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save forward stream CSV</source>
         <translation>Sauvegarder CSV flux aller</translation>
     </message>
@@ -4463,10 +4471,6 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
 <context>
     <name>InterfaceTreeModel</name>
     <message>
-        <source>No Interfaces found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show</source>
         <translation type="unfinished">Afficher</translation>
     </message>
@@ -4476,6 +4480,14 @@ For example, use 1 hour to have a new file created every hour on the hour.</sour
     </message>
     <message>
         <source>Interface Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No interfaces found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This version of Wireshark was built without packet capture support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6593,10 +6605,6 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
         <translation>Ignorer tous les paquets affichés</translation>
     </message>
     <message>
-        <source>Unignore All Displayed</source>
-        <translation>Ne plus ignorer tous les affichés</translation>
-    </message>
-    <message>
         <source>Set/Unset Time Reference</source>
         <translation>Fixer/Defixer le Temps de Réference</translation>
     </message>
@@ -6969,6 +6977,10 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
         <translation>Filtrer cette association</translation>
     </message>
     <message>
+        <source>&amp;I/O Graphs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Conversations</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7173,6 +7185,14 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>U&amp;nignore All Displayed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unignore all displayed packets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Time Shift…</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7211,10 +7231,6 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
     <message>
         <source>Export PDUs to File…</source>
         <translation>Exporter PDU vers un Fichier...</translation>
-    </message>
-    <message>
-        <source>&amp;I/O Graph</source>
-        <translation>Graphique &amp;I/O</translation>
     </message>
     <message>
         <source>Create graphs based on display filter fields</source>
@@ -7576,10 +7592,6 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
     </message>
     <message>
         <source>&amp;Unmark All Displayed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>U&amp;nignore all displayed packets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8045,6 +8057,22 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
     <message>
         <source>Icons &amp; Text</source>
         <translation>Icones et Texte</translation>
+    </message>
+    <message>
+        <source>Window title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Custom window title to be appended to the existing title&lt;br/&gt;%F = file path of the capture file&lt;br/&gt;%P = profile name&lt;br/&gt;%S = a conditional separator (&amp;quot; - &amp;quot;) that only shows when surrounded by variables with values or static text&lt;br/&gt;%V = version info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prepend window title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Custom window title to be prepended to the existing title&lt;br/&gt;%F = file path of the capture file&lt;br/&gt;%P = profile name&lt;br/&gt;%S = a conditional separator (&amp;quot; - &amp;quot;) that only shows when surrounded by variables with values or static text&lt;br/&gt;%V = version info&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Language: </source>
@@ -9019,6 +9047,10 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
     <message>
         <source>Frame</source>
         <translation>Trame</translation>
+    </message>
+    <message>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10247,6 +10279,10 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
     </message>
     <message>
         <source>Raw (*.raw)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analyzing RTP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11676,6 +11712,10 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
         <translation>Aucune zone de recherche valide sélectionné. Merci de le reporter à l&apos;équipe de développement.</translation>
     </message>
     <message>
+        <source>Searching for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>No packet contained those bytes.</source>
         <translation>Aucun paquet contient ces octets.</translation>
     </message>
@@ -12263,7 +12303,11 @@ Changer la direction de la connexion (voir le flux inverse).&lt;/p&gt;&lt;/body&
 <context>
     <name>SyntaxLineEdit</name>
     <message>
-        <source>&quot;%1&quot; is deprecated or may have unexpected results. See the User&apos;s Guide.</source>
+        <source>&quot;%1&quot; is deprecated in favour of &quot;%2&quot;. See the User&apos;s Guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;%1&quot; may have unexpected results. See the User&apos;s Guide.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

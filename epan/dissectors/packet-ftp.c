@@ -23,6 +23,7 @@
 #include <epan/expert.h>
 #include <epan/addr_resolv.h>
 #include <epan/proto_data.h>
+#include "packet-acdr.h"
 
 #include <tap.h>
 #include <ui/tap-credentials.h>
@@ -1036,17 +1037,13 @@ dissect_ftp(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void* data _U_)
                         if (strncmp(p_ftp_conv->last_command, "CWD ", 4) == 0) {
                             process_cwd_success(p_ftp_conv, p_ftp_conv->last_command+4);
                             /* Update path in packet */
-                            if (!pinfo->fd->visited) {
-                                store_directory_in_packet(pinfo, p_ftp_conv);
-                            }
+                            store_directory_in_packet(pinfo, p_ftp_conv);
                         }
                         /* Change Directory Up command (i.e. "CWD ..") */
                         else if (strncmp(p_ftp_conv->last_command, "CDUP", 4) == 0) {
                             process_cwd_success(p_ftp_conv, "..");
                             /* Update path in packet */
-                            if (!pinfo->fd->visited) {
-                                store_directory_in_packet(pinfo, p_ftp_conv);
-                            }
+                            store_directory_in_packet(pinfo, p_ftp_conv);
                         }
                     }
                 }
@@ -1661,6 +1658,7 @@ proto_reg_handoff_ftp(void)
 {
     dissector_add_uint_with_preference("tcp.port", TCP_PORT_FTPDATA, ftpdata_handle);
     dissector_add_uint_with_preference("tcp.port", TCP_PORT_FTP, ftp_handle);
+    dissector_add_uint("acdr.tls_application", TLS_APP_FTP, ftp_handle);
 
     data_text_lines_handle = find_dissector_add_dependency("data-text-lines", proto_ftp_data);
 

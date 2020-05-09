@@ -2498,7 +2498,7 @@ column_hidden_type_description_cb(void)
 static char *
 column_hidden_to_str_cb(pref_t* pref, gboolean default_val)
 {
-    GString     *cols_hidden = g_string_new ("");
+    GString     *cols_hidden;
     GList       *clp;
     fmt_data    *cfmt;
     pref_t  *format_pref;
@@ -2506,6 +2506,7 @@ column_hidden_to_str_cb(pref_t* pref, gboolean default_val)
     if (default_val)
         return g_strdup(pref->default_val.string);
 
+    cols_hidden = g_string_new("");
     format_pref = prefs_find_preference(gui_column_module, PRS_COL_FMT);
     clp = (format_pref) ? *format_pref->varp.list : NULL;
     while (clp) {
@@ -3294,12 +3295,12 @@ prefs_register_modules(void)
 
     prefs_register_bool_preference(gui_module, "update.enabled",
                                    "Check for updates",
-                                   "Check for updates (Windows only)",
+                                   "Check for updates (Windows and macOS only)",
                                    &prefs.gui_update_enabled);
 
     prefs_register_enum_preference(gui_module, "update.channel",
                        "Update channel",
-                       "The type of update to fetch. You should probably leave this set to UPDATE_CHANNEL_STABLE.",
+                       "The type of update to fetch. You should probably leave this set to STABLE.",
                        (gint*)(void*)(&prefs.gui_update_channel), gui_update_channel, FALSE);
 
     prefs_register_uint_preference(gui_module, "update.interval",
@@ -4156,11 +4157,7 @@ pre_init_prefs(void)
 
 /* set the default values for the capture dialog box */
     prefs.capture_prom_mode             = TRUE;
-#ifdef PCAP_NG_DEFAULT
     prefs.capture_pcap_ng               = TRUE;
-#else
-    prefs.capture_pcap_ng               = FALSE;
-#endif
     prefs.capture_real_time             = TRUE;
     prefs.capture_no_extcap             = FALSE;
     prefs.capture_auto_scroll           = TRUE;

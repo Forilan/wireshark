@@ -12,13 +12,18 @@
 
 /*
  * See https://quicwg.org
- * https://tools.ietf.org/html/draft-ietf-quic-transport-25
- * https://tools.ietf.org/html/draft-ietf-quic-tls-25
+ * https://tools.ietf.org/html/draft-ietf-quic-transport-27
+ * https://tools.ietf.org/html/draft-ietf-quic-tls-27
  * https://tools.ietf.org/html/draft-ietf-quic-invariants-07
+ *
+ * Extension:
+ * https://tools.ietf.org/html/draft-ferrieuxhamchaoui-quic-lossbits-03
  * https://tools.ietf.org/html/draft-pauly-quic-datagram-05
+ * https://tools.ietf.org/html/draft-huitema-quic-ts-02
+ * https://tools.ietf.org/html/draft-iyengar-quic-delayed-ack-00
  *
  * Currently supported QUIC version(s): draft -21, draft -22, draft -23,
- * draft-24, draft-25.
+ * draft-24, draft-25, draft-26, draft-27.
  * For a table of supported QUIC versions per Wireshark version, see
  * https://github.com/quicwg/base-drafts/wiki/Tools#wireshark
  *
@@ -145,6 +150,10 @@ static int hf_quic_cc_reason_phrase_length = -1;
 static int hf_quic_cc_reason_phrase = -1;
 static int hf_quic_dg_length = -1;
 static int hf_quic_dg = -1;
+static int hf_quic_af_sequence_number = -1;
+static int hf_quic_af_packet_tolerance = -1;
+static int hf_quic_af_update_max_ack_delay = -1;
+static int hf_quic_ts = -1;
 
 static expert_field ei_quic_connection_unknown = EI_INIT;
 static expert_field ei_quic_ft_unknown = EI_INIT;
@@ -322,6 +331,10 @@ static inline guint8 quic_draft_version(guint32 version) {
     if ((version >> 8) == 0xff0000) {
        return (guint8) version;
     }
+    /* Facebook mvfst, based on draft -22. */
+    if (version == 0xfaceb001) {
+        return 22;
+    }
     return 0;
 }
 
@@ -333,6 +346,7 @@ static inline gboolean is_quic_draft_max(guint32 version, guint8 max_version) {
 const value_string quic_version_vals[] = {
     { 0x00000000, "Version Negotiation" },
     { 0x51303434, "Google Q044" },
+    { 0xfaceb001, "Facebook mvfst (draft-22)" },
     { 0xff000004, "draft-04" },
     { 0xff000005, "draft-05" },
     { 0xff000006, "draft-06" },
@@ -355,6 +369,8 @@ const value_string quic_version_vals[] = {
     { 0xff000017, "draft-23" },
     { 0xff000018, "draft-24" },
     { 0xff000019, "draft-25" },
+    { 0xff00001a, "draft-26" },
+    { 0xff00001b, "draft-27" },
     { 0, NULL }
 };
 
@@ -380,6 +396,7 @@ static const value_string quic_long_packet_type_vals[] = {
     { 0, NULL }
 };
 
+/* https://github.com/quicwg/base-drafts/wiki/Temporary-IANA-Registry#quic-frame-types */
 #define FT_PADDING              0x00
 #define FT_PING                 0x01
 #define FT_ACK                  0x02
@@ -413,6 +430,8 @@ static const value_string quic_long_packet_type_vals[] = {
 #define FT_HANDSHAKE_DONE       0x1e
 #define FT_DATAGRAM             0x30
 #define FT_DATAGRAM_LENGTH      0x31
+#define FT_ACK_FREQUENCY        0xAF
+#define FT_TIME_STAMP           0x02F5
 
 static const range_string quic_frame_type_vals[] = {
     { 0x00, 0x00,   "PADDING" },
@@ -439,6 +458,8 @@ static const range_string quic_frame_type_vals[] = {
     { 0x1d, 0x1d,   "CONNECTION_CLOSE (Application)" },
     { 0x1e, 0x1e,   "HANDSHAKE_DONE" },
     { 0x30, 0x31,   "DATAGRAM" },
+    { 0xAF, 0xAF,   "ACK_FREQUENCY" },
+    { 0x02F5, 0x02F5, "TIME_STAMP" },
     { 0,    0,        NULL },
 };
 
@@ -841,7 +862,7 @@ quic_connection_update_initial(quic_info_data_t *conn, const quic_cid_t *scid, c
         // bytes, but non-conforming implementations could exist.
         memcpy(&conn->client_dcid_initial, dcid, sizeof(quic_cid_t));
         wmem_map_insert(quic_initial_connections, &conn->client_dcid_initial, conn);
-        conn->client_dcid_set = 1;
+        conn->client_dcid_set = TRUE;
     }
 }
 
@@ -913,7 +934,7 @@ quic_connection_create_or_update(quic_info_data_t **conn_p,
                 // packet populates the new value.
                 wmem_map_remove(quic_initial_connections, &conn->client_dcid_initial);
                 memset(&conn->client_dcid_initial, 0, sizeof(quic_cid_t));
-                conn->client_dcid_set = 0;
+                conn->client_dcid_set = FALSE;
             }
             if (conn->server_cids.data.len == 0 && scid->len) {
                 memcpy(&conn->server_cids.data, scid, sizeof(quic_cid_t));
@@ -947,15 +968,16 @@ dissect_quic_frame_type(tvbuff_t *tvb, packet_info *pinfo, proto_tree *quic_tree
 {
     proto_item *ti_ft, *ti_ftflags, *ti;
     proto_tree *ft_tree, *ftflags_tree;
-    guint32 frame_type;
+    guint64 frame_type;
+    guint32 lenft;
     guint   orig_offset = offset;
 
     ti_ft = proto_tree_add_item(quic_tree, hf_quic_frame, tvb, offset, 1, ENC_NA);
     ft_tree = proto_item_add_subtree(ti_ft, ett_quic_ft);
 
-    ti_ftflags = proto_tree_add_item_ret_uint(ft_tree, hf_quic_frame_type, tvb, offset, 1, ENC_NA, &frame_type);
-    proto_item_set_text(ti_ft, "%s", rval_to_str(frame_type, quic_frame_type_vals, "Unknown"));
-    offset += 1;
+    ti_ftflags = proto_tree_add_item_ret_varint(ft_tree, hf_quic_frame_type, tvb, offset, -1, ENC_VARINT_QUIC, &frame_type, &lenft);
+    proto_item_set_text(ti_ft, "%s", rval_to_str_const((guint32)frame_type, quic_frame_type_vals, "Unknown"));
+    offset += lenft;
 
     switch(frame_type){
         case FT_PADDING:{
@@ -1034,24 +1056,30 @@ dissect_quic_frame_type(tvbuff_t *tvb, packet_info *pinfo, proto_tree *quic_tree
             proto_tree_add_item_ret_varint(ft_tree, hf_quic_rsts_stream_id, tvb, offset, -1, ENC_VARINT_QUIC, &stream_id, &len_streamid);
             offset += len_streamid;
 
+            proto_item_append_text(ti_ft, " id=%" G_GINT64_MODIFIER "u", stream_id);
+            col_append_fstr(pinfo->cinfo, COL_INFO, "(%" G_GINT64_MODIFIER "u)", stream_id);
+
             proto_tree_add_item_ret_varint(ft_tree, hf_quic_rsts_application_error_code, tvb, offset, -1, ENC_VARINT_QUIC, &error_code, &len_error_code);
             offset += len_error_code;
 
             proto_tree_add_item_ret_varint(ft_tree, hf_quic_rsts_final_size, tvb, offset, -1, ENC_VARINT_QUIC, NULL, &len_finalsize);
             offset += len_finalsize;
 
-            proto_item_append_text(ti_ft, " Stream ID: %" G_GINT64_MODIFIER "u, Error code: %#" G_GINT64_MODIFIER "x", stream_id, error_code);
+            proto_item_append_text(ti_ft, " Error code: %#" G_GINT64_MODIFIER "x", error_code);
         }
         break;
         case FT_STOP_SENDING:{
             guint32 len_streamid;
-            guint64 error_code;
+            guint64 stream_id, error_code;
             guint32 len_error_code = 0;
 
             col_append_fstr(pinfo->cinfo, COL_INFO, ", SS");
 
-            proto_tree_add_item_ret_varint(ft_tree, hf_quic_ss_stream_id, tvb, offset, -1, ENC_VARINT_QUIC, NULL, &len_streamid);
+            proto_tree_add_item_ret_varint(ft_tree, hf_quic_ss_stream_id, tvb, offset, -1, ENC_VARINT_QUIC, &stream_id, &len_streamid);
             offset += len_streamid;
+
+            proto_item_append_text(ti_ft, " id=%" G_GINT64_MODIFIER "u", stream_id);
+            col_append_fstr(pinfo->cinfo, COL_INFO, "(%" G_GINT64_MODIFIER "u)", stream_id);
 
             proto_tree_add_item_ret_varint(ft_tree, hf_quic_ss_application_error_code, tvb, offset, -1, ENC_VARINT_QUIC, &error_code, &len_error_code);
             offset += len_error_code;
@@ -1159,11 +1187,15 @@ dissect_quic_frame_type(tvbuff_t *tvb, packet_info *pinfo, proto_tree *quic_tree
         break;
         case FT_MAX_STREAM_DATA:{
             guint32 len_streamid, len_maximumstreamdata;
+            guint64 stream_id;
 
             col_append_fstr(pinfo->cinfo, COL_INFO, ", MSD");
 
-            proto_tree_add_item_ret_varint(ft_tree, hf_quic_msd_stream_id, tvb, offset, -1, ENC_VARINT_QUIC, NULL, &len_streamid);
+            proto_tree_add_item_ret_varint(ft_tree, hf_quic_msd_stream_id, tvb, offset, -1, ENC_VARINT_QUIC, &stream_id, &len_streamid);
             offset += len_streamid;
+
+            proto_item_append_text(ti_ft, " id=%" G_GINT64_MODIFIER "u", stream_id);
+            col_append_fstr(pinfo->cinfo, COL_INFO, "(%" G_GINT64_MODIFIER "u)", stream_id);
 
             proto_tree_add_item_ret_varint(ft_tree, hf_quic_msd_maximum_stream_data, tvb, offset, -1, ENC_VARINT_QUIC, NULL, &len_maximumstreamdata);
             offset += len_maximumstreamdata;
@@ -1190,11 +1222,15 @@ dissect_quic_frame_type(tvbuff_t *tvb, packet_info *pinfo, proto_tree *quic_tree
         break;
         case FT_STREAM_DATA_BLOCKED:{
             guint32 len_streamid, len_offset;
+            guint64 stream_id;
 
             col_append_fstr(pinfo->cinfo, COL_INFO, ", SDB");
 
-            proto_tree_add_item_ret_varint(ft_tree, hf_quic_sdb_stream_id, tvb, offset, -1, ENC_VARINT_QUIC, NULL, &len_streamid);
+            proto_tree_add_item_ret_varint(ft_tree, hf_quic_sdb_stream_id, tvb, offset, -1, ENC_VARINT_QUIC, &stream_id, &len_streamid);
             offset += len_streamid;
+
+            proto_item_append_text(ti_ft, " id=%" G_GINT64_MODIFIER "u", stream_id);
+            col_append_fstr(pinfo->cinfo, COL_INFO, "(%" G_GINT64_MODIFIER "u)", stream_id);
 
             proto_tree_add_item_ret_varint(ft_tree, hf_quic_sdb_stream_data_limit, tvb, offset, -1, ENC_VARINT_QUIC, NULL, &len_offset);
             offset += len_offset;
@@ -1329,8 +1365,29 @@ dissect_quic_frame_type(tvbuff_t *tvb, packet_info *pinfo, proto_tree *quic_tree
             offset += (guint32)length;
         }
         break;
+        case FT_ACK_FREQUENCY:{
+            guint32 length;
+
+            proto_tree_add_item_ret_varint(ft_tree, hf_quic_af_sequence_number, tvb, offset, -1, ENC_VARINT_QUIC, NULL, &length);
+            offset += (guint32)length;
+
+            proto_tree_add_item_ret_varint(ft_tree, hf_quic_af_packet_tolerance, tvb, offset, -1, ENC_VARINT_QUIC, NULL, &length);
+            offset += (guint32)length;
+
+            proto_tree_add_item_ret_varint(ft_tree, hf_quic_af_update_max_ack_delay, tvb, offset, -1, ENC_VARINT_QUIC, NULL, &length);
+            offset += (guint32)length;
+        }
+        break;
+        case FT_TIME_STAMP:{
+            guint32 length;
+
+            proto_tree_add_item_ret_varint(ft_tree, hf_quic_ts, tvb, offset, -1, ENC_VARINT_QUIC, NULL, &length);
+            offset += (guint32)length;
+
+        }
+        break;
         default:
-            expert_add_info_format(pinfo, ti_ft, &ei_quic_ft_unknown, "Unknown Frame Type %u", frame_type);
+            expert_add_info_format(pinfo, ti_ft, &ei_quic_ft_unknown, "Unknown Frame Type %#" G_GINT64_MODIFIER "x", frame_type);
         break;
     }
 
@@ -1895,9 +1952,9 @@ quic_verify_retry_token(tvbuff_t *tvb, quic_packet_info_t *quic_packet, const qu
     // Plaintext is empty, there is no need to call gcry_cipher_encrypt.
     err = gcry_cipher_checktag(h, tvb_get_ptr(tvb, pseudo_packet_tail_length, 16), 16);
     if (err) {
-        quic_packet->retry_integrity_failure = 1;
+        quic_packet->retry_integrity_failure = TRUE;
     } else {
-        quic_packet->retry_integrity_success = 1;
+        quic_packet->retry_integrity_success = TRUE;
     }
     gcry_cipher_close(h);
 }
@@ -2031,6 +2088,8 @@ dissect_quic_retry_packet(tvbuff_t *tvb, packet_info *pinfo, proto_tree *quic_tr
         } else if (!quic_packet->retry_integrity_success) {
             expert_add_info_format(pinfo, ti, &ei_quic_bad_retry,
                     "Cannot verify Retry Packet due to unknown ODCID");
+        } else {
+            proto_item_append_text(ti, " [verified]");
         }
         offset += 16;
     }
@@ -2805,7 +2864,7 @@ proto_register_quic(void)
         },
         { &hf_quic_frame_type,
           { "Frame Type", "quic.frame_type",
-            FT_UINT8, BASE_RANGE_STRING | BASE_HEX, RVALS(quic_frame_type_vals), 0x0,
+            FT_UINT64, BASE_RANGE_STRING | BASE_HEX, RVALS(quic_frame_type_vals), 0x0,
             NULL, HFILL }
         },
 
@@ -3082,6 +3141,27 @@ proto_register_quic(void)
             { "Datagram", "quic.dg",
               FT_BYTES, BASE_NONE, NULL, 0x0,
               "The bytes of the datagram to be delivered", HFILL }
+        },
+        /* ACK-FREQUENCY */
+        { &hf_quic_af_sequence_number,
+            { "Sequence Number", "quic.af.sequence_number",
+              FT_UINT64, BASE_DEC, NULL, 0x0,
+              "Sequence number assigned to the ACK-FREQUENCY frame by the sender to allow receivers to ignore obsolete frames", HFILL }
+        },
+        { &hf_quic_af_packet_tolerance,
+            { "Packet Tolerance", "quic.af.packet_tolerance",
+              FT_UINT64, BASE_DEC, NULL, 0x0,
+              "Representing the maximum number of ack-eliciting packets after which the receiver sends an acknowledgement", HFILL }
+        },
+        { &hf_quic_af_update_max_ack_delay,
+            { "Update Max Ack Delay", "quic.af.update_max_ack_delay",
+              FT_UINT64, BASE_DEC, NULL, 0x0,
+              "Representing an update to the peer's 'max_ack_delay' transport parameter", HFILL }
+        },
+        { &hf_quic_ts,
+            { "Time Stamp", "quic.ts",
+              FT_UINT64, BASE_DEC, NULL, 0x0,
+              NULL, HFILL }
         },
     };
 

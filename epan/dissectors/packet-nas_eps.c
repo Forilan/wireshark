@@ -1,7 +1,7 @@
 /* packet-nas_eps.c
  * Routines for Non-Access-Stratum (NAS) protocol for Evolved Packet System (EPS) dissection
  *
- * Copyright 2008 - 2017, Anders Broman <anders.broman@ericsson.com>
+ * Copyright 2008 - 2020, Anders Broman <anders.broman@ericsson.com>
  *
  * Wireshark - Network traffic analyzer
  * By Gerald Combs <gerald@wireshark.org>
@@ -528,23 +528,25 @@ static const value_string security_header_type_vals[] = {
 };
 static value_string_ext security_header_type_vals_ext = VALUE_STRING_EXT_INIT(security_header_type_vals);
 
+/*
 typedef enum
 {
-    DE_EPS_CMN_ADD_INFO,                        /* 9.9.2.0  Additional information */
-    DE_EPS_CMN_DEVICE_PROPERTIES,               /* 9.9.2.0A Device properties */
-    DE_EPS_CMN_EPS_BE_CTX_STATUS,               /* 9.9.2.1  EPS bearer context status */
-    DE_EPS_CMN_LOC_AREA_ID,                     /* 9.9.2.2  Location area identification */
-    DE_EPS_CMN_MOB_ID,                          /* 9.9.2.3  Mobile identity */
-    DE_EPS_MS_CM_2,                             /* 9.9.2.4  Mobile station classmark 2 */
-    DE_EPS_MS_CM_3,                             /* 9.9.2.5  Mobile station classmark 3 */
-    DE_EPS_NAS_SEC_PAR_FROM_EUTRA,              /* 9.9.2.6  NAS security parameters from E-UTRA */
-    DE_EPS_NAS_SEC_PAR_TO_EUTRA,                /* 9.9.2.7  NAS security parameters to E-UTRA */
+    DE_EPS_CMN_ADD_INFO,                          9.9.2.0  Additional information
+    DE_EPS_CMN_DEVICE_PROPERTIES,                 9.9.2.0A Device properties
+    DE_EPS_CMN_EPS_BE_CTX_STATUS,                 9.9.2.1  EPS bearer context status
+    DE_EPS_CMN_LOC_AREA_ID,                       9.9.2.2  Location area identification
+    DE_EPS_CMN_MOB_ID,                            9.9.2.3  Mobile identity
+    DE_EPS_MS_CM_2,                               9.9.2.4  Mobile station classmark 2
+    DE_EPS_MS_CM_3,                               9.9.2.5  Mobile station classmark 3
+    DE_EPS_NAS_SEC_PAR_FROM_EUTRA,                9.9.2.6  NAS security parameters from E-UTRA
+    DE_EPS_NAS_SEC_PAR_TO_EUTRA,                  9.9.2.7  NAS security parameters to E-UTRA
 
-    DE_EPS_CMN_PLM_LST,                         /* 9.9.2.8  PLMN list */
-    DE_EPS_CMN_SUP_CODEC_LST,                   /* 9.9.2.6  9.9.2.10    Supported codec list */
-    DE_EPS_COMMON_NONE                          /* NONE */
+    DE_EPS_CMN_PLM_LST,                           9.9.2.8  PLMN list
+    DE_EPS_CMN_SUP_CODEC_LST,                     9.9.2.6  9.9.2.10    Supported codec list
+    DE_EPS_COMMON_NONE                            NONE
 }
 nas_eps_common_elem_idx_t;
+*/
 
 static const value_string nas_eps_common_elem_strings[] = {
     { DE_EPS_CMN_ADD_INFO, "Additional information" },                       /* 9.9.2.0  Additional information */
@@ -882,6 +884,14 @@ static const value_string nas_emm_elem_strings[] = {
     { DE_EMM_ADD_INFO_REQ, "Additional information requested" },               /* 9.9.3.55 Additional information requested */
     { DE_EMM_CIPH_KEY_DATA, "Ciphering key data" },                            /* 9.9.3.56 Ciphering key data */
     { DE_EMM_N1_UE_NETWORK_CAP, "N1 UE network capability" },                  /* 9.9.3.57 N1 UE network capability */
+/*
+ * 9.9.3.58    UE radio capability ID availability
+ * 9.9.3.59    UE radio capability ID request
+ * 9.9.3.60    UE radio capability ID
+ * 9.9.3.61    UE radio capability ID deletion indication
+ * 9.9.3.62    WUS assistance information
+ */
+
     { 0, NULL }
 };
 value_string_ext nas_emm_elem_strings_ext = VALUE_STRING_EXT_INIT(nas_emm_elem_strings);
@@ -2339,8 +2349,7 @@ de_emm_ext_emerg_num_list(tvbuff_t *tvb, proto_tree *tree, packet_info *pinfo _U
                                      tvb, curr_offset, 1, ENC_NA, &length);
         curr_offset++;
         if (length > 0) {
-            const char *digit_str = tvb_bcd_dig_to_wmem_packet_str(tvb, curr_offset, length, NULL, FALSE);
-            proto_tree_add_string(sub_tree, hf_eps_emm_ext_emerg_num_list_emerg_num, tvb, curr_offset, length, digit_str);
+            proto_tree_add_item(sub_tree, hf_eps_emm_ext_emerg_num_list_emerg_num, tvb, curr_offset, length, ENC_BCD_DIGITS_0_9);
             curr_offset += length;
         }
         proto_tree_add_item_ret_uint(sub_tree, hf_eps_emm_ext_emerg_num_list_sub_serv_field_len,
@@ -2830,6 +2839,18 @@ de_emm_n1_ue_network_cap(tvbuff_t* tvb, proto_tree* tree, packet_info* pinfo _U_
 
     return 1;
 }
+
+/*
+ * 9.9.3.58    UE radio capability ID availability
+ * 9.9.3.59    UE radio capability ID request
+ * 9.9.3.60    UE radio capability ID
+ * See subclause 9.11.3.65 in 3GPP TS 24.501
+ * 9.9.3.61    UE radio capability ID deletion indication
+ * See subclause 9.11.3.zz in 3GPP TS 24.501
+ * 9.9.3.62    WUS assistance information
+ */
+
+
 /*
  * 9.9.4    EPS Session Management (ESM) information elements
  */
@@ -3324,9 +3345,10 @@ de_esm_pdn_addr(tvbuff_t *tvb, proto_tree *tree, packet_info *pinfo _U_,
 {
     guint32 curr_offset;
     guint8  pdn_type;
+    ws_in6_addr   interface_id;
 
+    memset(&interface_id, 0, sizeof(interface_id));
     curr_offset = offset;
-
 
     pdn_type  = tvb_get_guint8(tvb, offset) & 0x7;
     proto_tree_add_bits_item(tree, hf_nas_eps_spare_bits, tvb, curr_offset<<3, 5, ENC_BIG_ENDIAN);
@@ -3345,7 +3367,8 @@ de_esm_pdn_addr(tvbuff_t *tvb, proto_tree *tree, packet_info *pinfo _U_,
              * contains an IPv6 interface identifier. Bit 8 of octet 4 represents the most significant bit
              * of the IPv6 interface identifier and bit 1 of octet 11 the least significant bit.
              */
-            proto_tree_add_item(tree, hf_nas_eps_esm_pdn_ipv6_if_id, tvb, curr_offset, 8, ENC_NA);
+            tvb_memcpy(tvb, (guint8*)&interface_id.bytes[8], offset, 8);
+            proto_tree_add_ipv6(tree, hf_nas_eps_esm_pdn_ipv6_if_id, tvb, offset, 8, &interface_id);
             curr_offset+=8;
             break;
         case 3:
@@ -3356,7 +3379,8 @@ de_esm_pdn_addr(tvbuff_t *tvb, proto_tree *tree, packet_info *pinfo _U_,
              * significant bit. Bit 8 of octet 12 represents the most significant bit of the IPv4 address
              * and bit 1 of octet 15 the least significant bit.
              */
-            proto_tree_add_item(tree, hf_nas_eps_esm_pdn_ipv6_if_id, tvb, curr_offset, 8, ENC_NA);
+            tvb_memcpy(tvb, (guint8*)&interface_id.bytes[8], offset, 8);
+            proto_tree_add_ipv6(tree, hf_nas_eps_esm_pdn_ipv6_if_id, tvb, offset, 8, &interface_id);
             curr_offset+=8;
             proto_tree_add_item(tree, hf_nas_eps_esm_pdn_ipv4, tvb, curr_offset, 4, ENC_BIG_ENDIAN);
             curr_offset+=4;
@@ -3569,8 +3593,13 @@ de_esm_remote_ue_context_list(tvbuff_t *tvb, proto_tree *tree, packet_info *pinf
                 curr_offset += 2;
                 break;
             case 2:
-                proto_tree_add_item(subtree, hf_nas_eps_esm_remote_ue_context_list_ue_context_ipv6_prefix, tvb, curr_offset, 8, ENC_NA);
-                curr_offset += 8;
+                {
+                    ws_in6_addr prefix;
+                    memset(&prefix, 0, sizeof(prefix));
+                    tvb_memcpy(tvb, (guint8*)&prefix.bytes[0], offset, 8);
+                    proto_tree_add_ipv6(subtree, hf_nas_eps_esm_remote_ue_context_list_ue_context_ipv6_prefix, tvb, curr_offset, 8, &prefix);
+                    curr_offset += 8;
+                }
                 break;
             case 0:
             default:
@@ -4045,6 +4074,14 @@ guint16 (*emm_elem_fcn[])(tvbuff_t *tvb, proto_tree *tree, packet_info *pinfo, g
     de_emm_add_info_req,        /* 9.9.3.55 Additional information requested */
     de_emm_ciph_key_data,       /* 9.9.3.56 Ciphering key data */
     de_emm_n1_ue_network_cap,   /* 9.9.3.57 N1 UE network capability */
+/*
+ * 9.9.3.58    UE radio capability ID availability
+ * 9.9.3.59    UE radio capability ID request
+ * 9.9.3.60    UE radio capability ID
+ * 9.9.3.61    UE radio capability ID deletion indication
+ * 9.9.3.62    WUS assistance information
+ */
+
     NULL,   /* NONE */
 };
 
@@ -7856,7 +7893,7 @@ proto_register_nas_eps(void)
     },
     { &hf_nas_eps_esm_pdn_ipv6_if_id,
         {"PDN IPv6 if id", "nas_eps.esm.pdn_ipv6_if_id",
-        FT_BYTES, BASE_NONE, NULL, 0x0,
+        FT_IPv6, BASE_NONE, NULL, 0x0,
         NULL, HFILL}
     },
     { &hf_nas_eps_esm_eplmnc,
@@ -7946,7 +7983,7 @@ proto_register_nas_eps(void)
     },
     { &hf_nas_eps_esm_remote_ue_context_list_ue_context_ipv6_prefix,
         { "IPv6 prefix","nas_eps.esm.remote_ue_context_list.ue_context.ipv6_prefix",
-        FT_BYTES, BASE_NONE, NULL, 0x0,
+        FT_IPv6, BASE_NONE, NULL, 0x0,
         NULL, HFILL }
     },
     { &hf_nas_eps_esm_pkmf_address_type,

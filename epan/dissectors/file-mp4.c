@@ -239,7 +239,6 @@ dissect_mp4_full_box(tvbuff_t *tvb, gint offset, proto_tree *tree,
         proto_tree_add_item(tree, hf_mp4_full_box_flags,
                 tvb, offset, 3, ENC_BIG_ENDIAN);
     }
-    offset += 3;
 
     return 1 + 3;
 }
@@ -464,7 +463,7 @@ dissect_mp4_stsz_body(tvbuff_t *tvb, gint offset, gint len _U_,
 
 
 static gint
-dissect_mp4_stsc_body(tvbuff_t *tvb, gint offset, gint len _U_,
+dissect_mp4_stsc_body(tvbuff_t *tvb, gint offset, gint len,
         packet_info *pinfo _U_, guint depth _U_, proto_tree *tree)
 {
     guint32  entry_count;
@@ -577,7 +576,7 @@ dissect_mp4_url_body(tvbuff_t *tvb, gint offset, gint len,
         NULL
     };
 
-    offset += dissect_mp4_full_box (tvb, offset, tree, flags_fields, NULL,
+    dissect_mp4_full_box (tvb, offset, tree, flags_fields, NULL,
             &flags);
     /* XXX - put up an expert info if version!=0 */
 

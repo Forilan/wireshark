@@ -79,6 +79,7 @@
 #include "ui/commandline.h"
 #include "ui/capture_ui_utils.h"
 #include "ui/preference_utils.h"
+#include "ui/software_update.h"
 #include "ui/taps.h"
 
 #include "ui/qt/conversation_dialog.h"
@@ -137,8 +138,8 @@
 # INFO     = 64
 # DEBUG    = 128
 
-*/
 #define DEBUG_STARTUP_TIME_LOGLEVEL 252
+*/
 
 /* update the main window */
 void main_window_update(void)
@@ -225,6 +226,14 @@ get_gui_compiled_info(GString *str)
 #else
     g_string_append(str, "without QtMultimedia");
 #endif
+
+    g_string_append(str, ", ");
+    const char *update_info = software_update_info();
+    if (update_info) {
+        g_string_append_printf(str, "with automatic updates using %s", update_info);
+    } else {
+        g_string_append_printf(str, "without automatic updates");
+    }
 
 #ifdef _WIN32
     g_string_append(str, ", ");
@@ -315,11 +324,8 @@ g_log_message_handler(QtMsgType type, const QMessageLogContext &, const QString 
  *  we pop up will be above the main window.
  */
 static void
-check_and_warn_user_startup(const QString &cf_name)
+check_and_warn_user_startup()
 {
-#ifndef _WIN32
-    Q_UNUSED(cf_name)
-#endif
     gchar               *cur_user, *cur_group;
 
     /* Tell the user not to run as root. */
@@ -335,16 +341,6 @@ check_and_warn_user_startup(const QString &cf_name)
         g_free(cur_user);
         g_free(cur_group);
     }
-
-#ifdef _WIN32
-    /* Warn the user if npf.sys isn't loaded. */
-    if (!get_stdin_capture() && cf_name.isEmpty() && !npf_sys_is_running() && recent.privs_warn_if_no_npf) {
-        simple_message_box(ESD_TYPE_WARN, &recent.privs_warn_if_no_npf, "%s",
-        "The NPF driver isn't running. You may have trouble\n"
-        "capturing or listing interfaces.");
-    }
-#endif
-
 }
 #endif
 
@@ -899,7 +895,7 @@ int main(int argc, char *qt_argv[])
                 g_free(s);
             }
             /* "-k" was specified; start a capture. */
-            check_and_warn_user_startup(cf_name);
+            check_and_warn_user_startup();
 
             /* If no user interfaces were specified on the command line,
                copy the list of selected interfaces to the set of interfaces

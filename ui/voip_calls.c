@@ -1441,6 +1441,10 @@ isup_calls_packet(void *tap_offset_ptr, packet_info *pinfo, epan_dissect_t *edt,
                     callsinfo->call_state = VOIP_COMPLETED;
                     tapinfo->completed_calls++;
                 }
+                /* Overwrite any comment set above */
+                if (comment) {
+                    g_free(comment);
+                }
                 comment = g_strdup_printf("Cause %i - %s",
                         pi->cause_value,
                         val_to_str_ext_const(pi->cause_value, &q931_cause_code_vals_ext, "(Unknown)"));
@@ -3780,6 +3784,7 @@ unistim_calls_packet(void *tap_offset_ptr, packet_info *pinfo, epan_dissect_t *e
 
     /* free data */
     g_free(comment);
+    g_string_free(g_tmp, TRUE);
 
     tapinfo->redraw |= REDRAW_UNISTIM;
 

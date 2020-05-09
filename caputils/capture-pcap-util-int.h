@@ -1,5 +1,5 @@
 /* capture-pcap-util-int.h
- * Definitions of routines internal to the libpcap/WinPcap utilities
+ * Definitions of routines internal to the libpcap/WinPcap/Npcap utilities
  *
  * Wireshark - Network traffic analyzer
  * By Gerald Combs <gerald@wireshark.org>
@@ -14,13 +14,12 @@
 extern if_info_t *if_info_new(const char *name, const char *description,
 	gboolean loopback);
 extern void if_info_add_address(if_info_t *if_info, struct sockaddr *addr);
-#ifdef HAVE_PCAP_FINDALLDEVS
 #ifdef HAVE_PCAP_REMOTE
-extern GList *get_interface_list_findalldevs_ex(const char *source,
-        struct pcap_rmtauth *auth, int *err, char **err_str);
+extern GList *get_interface_list_findalldevs_ex(const char *hostname,
+    const char *port, int auth_type, const char *username, const char *passwd,
+    int *err, char **err_str);
 #endif /* HAVE_PCAP_REMOTE */
 extern GList *get_interface_list_findalldevs(int *err, char **err_str);
-#endif /* HAVE_PCAP_FINDALLDEVS */
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 /*

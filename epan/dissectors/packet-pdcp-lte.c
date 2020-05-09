@@ -426,18 +426,18 @@ static const value_string control_pdu_type_vals[] = {
 };
 
 static const value_string integrity_algorithm_vals[] = {
-    { 0,   "EIA0" },
-    { 1,   "EIA1" },
-    { 2,   "EIA2" },
-    { 3,   "EIA3" },
+    { 0,   "EIA0 (NULL)" },
+    { 1,   "EIA1 (SNOW3G)" },
+    { 2,   "EIA2 (AES)" },
+    { 3,   "EIA3 (ZUC)" },
     { 0,   NULL }
 };
 
 static const value_string ciphering_algorithm_vals[] = {
-    { 0,   "EEA0" },
-    { 1,   "EEA1" },
-    { 2,   "EEA2" },
-    { 3,   "EEA3" },
+    { 0,   "EEA0 (NULL)" },
+    { 1,   "EEA1 (SNOW3G)" },
+    { 2,   "EEA2 (AES)" },
+    { 3,   "EEA3 (ZUC)" },
     { 0,   NULL }
 };
 
@@ -1932,7 +1932,7 @@ static int dissect_pdcp_lte(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
 
             /**********************************/
             /* User-plane messages            */
-            gboolean pdu_type = (first_byte & 0x80) >> 7;
+            guint8 pdu_type = (first_byte & 0x80) >> 7;
 
             /* Data/Control flag */
             proto_tree_add_item(pdcp_tree, hf_pdcp_lte_data_control, tvb, offset, 1, ENC_BIG_ENDIAN);

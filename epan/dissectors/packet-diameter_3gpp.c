@@ -38,18 +38,23 @@ static expert_field ei_diameter_3gpp_plmn_id_wrong_len = EI_INIT;
 /* Initialize the protocol and registered fields */
 static int proto_diameter_3gpp          = -1;
 
-static int hf_diameter_3gpp_timezone                = -1;
-static int hf_diameter_3gpp_timezone_adjustment     = -1;
-static int hf_diameter_3gpp_rat_type                = -1;
-static int hf_diameter_3gpp_visited_nw_id           = -1;
-static int hf_diameter_3gpp_path                    = -1;
-static int hf_diameter_3gpp_contact                 = -1;
-/* static int hf_diameter_3gpp_user_data               = -1; */
-static int hf_diameter_3gpp_ipaddr                  = -1;
-static int hf_diameter_3gpp_mbms_required_qos_prio  = -1;
-static int hf_diameter_3gpp_tmgi                    = -1;
-static int hf_diameter_3gpp_service_ind             = -1;
-static int hf_diameter_mbms_service_id              = -1;
+static int hf_diameter_3gpp_timezone = -1;
+static int hf_diameter_3gpp_timezone_adjustment = -1;
+static int hf_diameter_3gpp_rat_type = -1;
+static int hf_diameter_3gpp_visited_nw_id = -1;
+static int hf_diameter_3gpp_path = -1;
+static int hf_diameter_3gpp_contact = -1;
+/* static int hf_diameter_3gpp_user_data = -1; */
+static int hf_diameter_3gpp_ipaddr = -1;
+static int hf_diameter_3gpp_mbms_required_qos_prio = -1;
+static int hf_diameter_3gpp_tmgi = -1;
+static int hf_diameter_3gpp_service_ind = -1;
+static int hf_diameter_3gpp_req_nodes = -1;
+static int hf_diameter_3gpp_req_nodes_bit0 = -1;
+static int hf_diameter_3gpp_req_nodes_bit1 = -1;
+static int hf_diameter_3gpp_req_nodes_bit2 = -1;
+static int hf_diameter_3gpp_req_nodes_bit3 = -1;
+static int hf_diameter_mbms_service_id = -1;
 static int hf_diameter_3gpp_spare_bits = -1;
 static int hf_diameter_3gpp_uar_flags_flags = -1;
 static int hf_diameter_3gpp_uar_flags_flags_bit0 = -1;
@@ -315,6 +320,8 @@ static int hf_diameter_3gpp_charging_rule_name = -1;
 static int hf_diameter_3gpp_monitoring_key = -1;
 static int hf_diameter_3gpp_mbms_bearer_event = -1;
 static int hf_diameter_3gpp_mbms_bearer_event_bit0 = -1;
+static int hf_diameter_3gpp_mbms_bearer_event_bit1 = -1;
+static int hf_diameter_3gpp_mbms_bearer_event_bit2 = -1;
 static int hf_diameter_3gpp_mbms_bearer_result = -1;
 static int hf_diameter_3gpp_mbms_bearer_result_bit0 = -1;
 static int hf_diameter_3gpp_mbms_bearer_result_bit1 = -1;
@@ -383,6 +390,18 @@ static int hf_diameter_3gpp_core_network_restrictions = -1;
 static int hf_diameter_3gpp_core_network_restrictions_spare_bits = -1;
 static int hf_diameter_3gpp_core_network_restrictions_bit1 = -1;
 static int hf_diameter_3gpp_core_network_restrictions_bit0 = -1;
+static int hf_diameter_3gpp_supported_gad_shapes = -1;
+static int hf_diameter_3gpp_highaccuracyellipsoidpointwithaltitudeanduncertaintyellipsoid_bit8 = -1;
+static int hf_diameter_3gpp_highaccuracyellipsoidpointwithuncertaintyellipse_bit7 = -1;
+static int hf_diameter_3gpp_ellipsoidarc_bit6 = -1;
+static int hf_diameter_3gpp_ellipsoidpointwithaltitudeanduncertaintyelipsoid_bit5 = -1;
+static int hf_diameter_3gpp_ellipsoidpointwithaltitude_bit4 = -1;
+static int hf_diameter_3gpp_polygon_bit3 = -1;
+static int hf_diameter_3gpp_ellipsoidpointwithuncertaintyellipse_bit2 = -1;
+static int hf_diameter_3gpp_ellipsoidpointwithuncertaintycircle_bit1 = -1;
+static int hf_diameter_3gpp_ellipsoidpoint_bit0 = -1;
+
+
 static int hf_diameter_3gpp_uar_flags_flags_spare_bits = -1;
 static int hf_diameter_3gpp_feature_list1_sh_flags_spare_bits = -1;
 static int hf_diameter_3gpp_feature_list2_s6a_flags_spare_bits = -1;
@@ -498,6 +517,7 @@ static gint diameter_3gpp_mbms_bearer_result_ett = -1;
 static gint diameter_3gpp_tmgi_allocation_result_ett = -1;
 static gint diameter_3gpp_tmgi_deallocation_result_ett = -1;
 static gint diameter_3gpp_sar_flags_ett = -1;
+static gint diameter_3gpp_req_nodes_ett = -1;
 static gint diameter_3gpp_emergency_services_flags_ett = -1;
 static gint diameter_3gpp_pur_flags_ett = -1;
 static gint diameter_3gpp_clr_flags_ett = -1;
@@ -510,6 +530,7 @@ static gint diameter_3gpp_air_flags_ett = -1;
 static gint diameter_3gpp_preferred_data_mode_ett = -1;
 static gint diameter_3gpp_v2x_permission_ett = -1;
 static gint diameter_3gpp_core_network_restrictions_ett = -1;
+static gint diameter_3gpp_supported_gad_shapes_ett = -1;
 static gint diameter_3gpp_plr_flags_ett = -1;
 static gint diameter_3gpp_pla_flags_ett = -1;
 static gint diameter_3gpp_deferred_location_type_ett = -1;
@@ -744,18 +765,24 @@ dissect_diameter_3gpp_af_application_identifier(tvbuff_t *tvb, packet_info *pinf
     proto_item *item;
     int offset = 0;
     int length = tvb_reported_length(tvb);
+    int new_len, start_len = length;
     diam_sub_dis_t *diam_sub_dis = (diam_sub_dis_t*)data;
+    guint8 tempchar;
 
-    if (tree){
-        if (!tvb_ascii_isprint(tvb, 0, length))
-            return length;
+    /* Skipp NULL trermination and/or padding at the end */
+    for (new_len = length; new_len > start_len - 4 &&
+        ((tempchar = tvb_get_guint8(tvb, new_len - 1)) == 0); new_len--);
 
-        item = proto_tree_add_item_ret_string(tree, hf_diameter_3gpp_af_application_identifier, tvb, offset, length,
-                                                ENC_UTF_8 | ENC_NA, wmem_packet_scope(), (const guint8**)&diam_sub_dis->avp_str);
-        proto_item_set_generated(item);
-    }
+    length = new_len;
 
-    return length;
+    if (!tvb_ascii_isprint(tvb, 0, length))
+        return start_len;
+
+    item = proto_tree_add_item_ret_string(tree, hf_diameter_3gpp_af_application_identifier, tvb, offset, length,
+                                            ENC_UTF_8 | ENC_NA, wmem_packet_scope(), (const guint8**)&diam_sub_dis->avp_str);
+    proto_item_set_generated(item);
+
+    return start_len;
 }
 
 /*
@@ -1283,6 +1310,35 @@ dissect_diameter_3gpp_service_ind(tvbuff_t *tvb, packet_info *pinfo _U_, proto_t
 
     return length;
 }
+
+/*
+ * AVP Code: 713 Requested-Nodes
+ */
+
+static int
+dissect_diameter_3gpp_req_nodes(tvbuff_t* tvb, packet_info* pinfo _U_, proto_tree* tree, void* data)
+{
+
+    static const int* diameter_3gpp_req_nodes_fields[] = {
+    &hf_diameter_3gpp_req_nodes_bit3,
+    &hf_diameter_3gpp_req_nodes_bit2,
+    &hf_diameter_3gpp_req_nodes_bit1,
+    &hf_diameter_3gpp_req_nodes_bit0,
+    NULL
+    };
+
+    diam_sub_dis_t* diam_sub_dis_inf = (diam_sub_dis_t*)data;
+
+    /* Hide the item created in packet-diameter.c and only show the one created here */
+    proto_item_set_hidden(diam_sub_dis_inf->item);
+
+    /* Change to BMT_NO_FALSE if the list gets to long(?)*/
+    proto_tree_add_bitmask_with_flags(tree, tvb, 0, hf_diameter_3gpp_req_nodes,
+        diameter_3gpp_req_nodes_ett, diameter_3gpp_req_nodes_fields, ENC_BIG_ENDIAN, BMT_NO_FALSE);
+
+    return 4;
+}
+
 
 /* AVP Code: 900 TMGI */
 static int
@@ -2487,7 +2543,7 @@ dissect_diameter_3gpp_v2x_permission(tvbuff_t *tvb, packet_info *pinfo _U_, prot
 * 7.3.230 Core-Network-Restrictions
 * AVP Code: 1704 Core-Network-Restrictions
 */
-static int
+int
 dissect_diameter_3gpp_core_network_restrictions(tvbuff_t *tvb, packet_info *pinfo _U_, proto_tree *tree, void *data)
 {
     static const int *flags[] = {
@@ -2497,12 +2553,40 @@ dissect_diameter_3gpp_core_network_restrictions(tvbuff_t *tvb, packet_info *pinf
         NULL
     };
 
+    if(data){
+        diam_sub_dis_t* diam_sub_dis_inf = (diam_sub_dis_t*)data;
+
+        /* Hide the item created in packet-diameter.c and only show the one created here */
+        proto_item_set_hidden(diam_sub_dis_inf->item);
+    }
+    proto_tree_add_bitmask_with_flags(tree, tvb, 0, hf_diameter_3gpp_core_network_restrictions, diameter_3gpp_core_network_restrictions_ett, flags, ENC_BIG_ENDIAN, BMT_NO_APPEND);
+    return 4;
+}
+
+/* AVP Code: 2510 Supported-GAD-Shapes */
+static int
+dissect_diameter_3gpp_supported_gad_shapes(tvbuff_t* tvb, packet_info* pinfo _U_, proto_tree* tree, void* data)
+{
+    static const int* flags[] = {
+        &hf_diameter_3gpp_highaccuracyellipsoidpointwithaltitudeanduncertaintyellipsoid_bit8,
+        &hf_diameter_3gpp_highaccuracyellipsoidpointwithuncertaintyellipse_bit7,
+        &hf_diameter_3gpp_ellipsoidarc_bit6,
+        &hf_diameter_3gpp_ellipsoidpointwithaltitudeanduncertaintyelipsoid_bit5,
+        &hf_diameter_3gpp_ellipsoidpointwithaltitude_bit4,
+        &hf_diameter_3gpp_polygon_bit3,
+        &hf_diameter_3gpp_ellipsoidpointwithuncertaintyellipse_bit2,
+        &hf_diameter_3gpp_ellipsoidpointwithuncertaintycircle_bit1,
+        &hf_diameter_3gpp_ellipsoidpoint_bit0,
+        NULL
+    };
+
     diam_sub_dis_t* diam_sub_dis_inf = (diam_sub_dis_t*)data;
 
     /* Hide the item created in packet-diameter.c and only show the one created here */
     proto_item_set_hidden(diam_sub_dis_inf->item);
 
-    proto_tree_add_bitmask_with_flags(tree, tvb, 0, hf_diameter_3gpp_core_network_restrictions, diameter_3gpp_core_network_restrictions_ett, flags, ENC_BIG_ENDIAN, BMT_NO_APPEND);
+    proto_tree_add_bitmask_with_flags(tree, tvb, 0, hf_diameter_3gpp_supported_gad_shapes, diameter_3gpp_supported_gad_shapes_ett, flags, ENC_BIG_ENDIAN, BMT_NO_APPEND);
+
     return 4;
 }
 
@@ -2746,10 +2830,13 @@ dissect_diameter_3gpp_sm_rp_ui(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tr
     int length = tvb_reported_length(tvb);
     diam_sub_dis_t *diam_sub_dis_inf = (diam_sub_dis_t*)data;
     guint32 cmd = 0;
+    gboolean save_writable = col_get_writable(pinfo->cinfo, -1 /* All */);
 
     if (diam_sub_dis_inf) {
         cmd = diam_sub_dis_inf->cmd_code;
     }
+
+    col_set_writable(pinfo->cinfo, -1, FALSE);
 
     if ((length > 0) && (cmd != 0)) {
         switch (cmd){
@@ -2776,6 +2863,8 @@ dissect_diameter_3gpp_sm_rp_ui(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tr
         }
     }
 
+    col_set_writable(pinfo->cinfo, -1, save_writable);
+
     return length;
 
 }
@@ -2787,6 +2876,8 @@ dissect_diameter_3gpp_mbms_bearer_event(tvbuff_t *tvb, packet_info *pinfo _U_, p
 {
     static const int *flags[] = {
         &hf_diameter_3gpp_mbms_bearer_event_spare_bits,
+        &hf_diameter_3gpp_mbms_bearer_event_bit2,
+        &hf_diameter_3gpp_mbms_bearer_event_bit1,
         &hf_diameter_3gpp_mbms_bearer_event_bit0,
         NULL
     };
@@ -2950,6 +3041,9 @@ proto_reg_handoff_diameter_3gpp(void)
     /* AVP Code: 704 Service-Indication  */
     dissector_add_uint("diameter.3gpp", 704, create_dissector_handle(dissect_diameter_3gpp_service_ind, proto_diameter_3gpp));
 
+    /* AVP Code: 713 Requested-Nodes */
+    dissector_add_uint("diameter.3gpp", 713, create_dissector_handle(dissect_diameter_3gpp_req_nodes, proto_diameter_3gpp));
+
     /* AVP Code: 900 TMGI */
     dissector_add_uint("diameter.3gpp", 900, create_dissector_handle(dissect_diameter_3gpp_tmgi, proto_diameter_3gpp));
 
@@ -3087,6 +3181,9 @@ proto_reg_handoff_diameter_3gpp(void)
     /* AVP Code: 1704 Core-Network-Restrictions */
     dissector_add_uint("diameter.3gpp", 1704, create_dissector_handle(dissect_diameter_3gpp_core_network_restrictions, proto_diameter_3gpp));
 
+    /* AVP Code: 2510 Supported-GAD-Shapes */
+    dissector_add_uint("diameter.3gpp", 2510, create_dissector_handle(dissect_diameter_3gpp_supported_gad_shapes, proto_diameter_3gpp));
+
     /* AVP Code: 2516 EUTRAN-Positioning-Data */
     dissector_add_uint("diameter.3gpp", 2516, create_dissector_handle(dissect_diameter_3gpp_eutran_positioning_data, proto_diameter_3gpp));
 
@@ -3152,7 +3249,7 @@ const range_string diameter_3gpp_qos_delay_cls_vals[] = {
     { 0x03, 0x03, "Delay class 3" },
     { 0x04, 0x04, "Delay class 4 (best effort)" },
     { 0x05, 0x06, "Interpreted as Delay class 4 (best effort)" },
-    { 0x07, 0x00, "Reserved" },
+    { 0x07, 0x07, "Reserved" },
     { 0, 0, NULL }
 };
 
@@ -3337,6 +3434,31 @@ proto_register_diameter_3gpp(void)
         { &hf_diameter_3gpp_service_ind,
             { "Service-Indication",           "diameter.3gpp.service_ind",
             FT_STRING, BASE_NONE, NULL, 0x0,
+            NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_req_nodes,
+        { "Requested-Nodes", "diameter.3gpp.req_nodes",
+            FT_UINT32, BASE_HEX, NULL, 0x0,
+            NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_req_nodes_bit0,
+            { "MME", "diameter.3gpp.req_nodes_bit0",
+            FT_BOOLEAN, 32, NULL, 0x00000001,
+            NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_req_nodes_bit1,
+            { "SGSN", "diameter.3gpp.req_nodes_bit1",
+            FT_BOOLEAN, 32, NULL, 0x00000002,
+            NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_req_nodes_bit2,
+            { "3GPP-AAA-SERVER-TWAN", "diameter.3gpp.req_nodes_bit2",
+            FT_BOOLEAN, 32, NULL, 0x00000004,
+            NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_req_nodes_bit3,
+            { "AMF", "diameter.3gpp.req_nodes_bit3",
+            FT_BOOLEAN, 32, NULL, 0x00000008,
             NULL, HFILL }
         },
         { &hf_diameter_mbms_service_id,
@@ -4767,9 +4889,19 @@ proto_register_diameter_3gpp(void)
             FT_BOOLEAN, 32, TFS(&tfs_set_notset), 0x00000001,
             NULL, HFILL }
         },
+        { &hf_diameter_3gpp_mbms_bearer_event_bit1,
+            { "Bearer Activated", "diameter.3gpp.mbms_bearer_event_bit1",
+            FT_BOOLEAN, 32, TFS(&tfs_set_notset), 0x00000002,
+            NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_mbms_bearer_event_bit2,
+            { "Userplane Event", "diameter.3gpp.mbms_bearer_event_bit2",
+            FT_BOOLEAN, 32, TFS(&tfs_set_notset), 0x00000004,
+            NULL, HFILL }
+        },
         { &hf_diameter_3gpp_mbms_bearer_event_spare_bits,
             { "Spare", "diameter.3gpp.mbms_bearer_event_spare",
-            FT_UINT32, BASE_HEX, NULL, 0x0,
+            FT_UINT32, BASE_HEX, NULL, 0xfffffff8,
             NULL, HFILL }
         },
         { &hf_diameter_3gpp_mbms_bearer_result,
@@ -5405,10 +5537,62 @@ proto_register_diameter_3gpp(void)
           NULL, HFILL }
         },
         { &hf_diameter_3gpp_core_network_restrictions_bit0,
-        { "EPS", "diameter.3gpp.core_network_restrictions_bit0",
-          FT_BOOLEAN, 32, TFS(&tfs_not_allowed_allowed), 0x00000001,
+        { "Reserved", "diameter.3gpp.core_network_restrictions_bit0",
+          FT_UINT32, BASE_HEX, NULL, 0x00000001,
           NULL, HFILL }
         },
+        { &hf_diameter_3gpp_supported_gad_shapes,
+        { "Supported-GAD-Shapes", "diameter.3gpp.supported_gad_shapes",
+          FT_UINT32, BASE_HEX, NULL, 0x0,
+          NULL, HFILL }
+        },
+
+        { &hf_diameter_3gpp_highaccuracyellipsoidpointwithaltitudeanduncertaintyellipsoid_bit8,
+        { "highAccuracyEllipsoidPointWithAltitudeAndUncertaintyEllipsoid", "diameter.3gpp.highaccuracyellipsoidpointwithaltitudeanduncertaintyellipsoid_bit8",
+          FT_BOOLEAN, 32, TFS(&tfs_supported_not_supported), 0x00000100,
+          NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_highaccuracyellipsoidpointwithuncertaintyellipse_bit7,
+        { "highAccuracyEllipsoidPointWithUncertaintyEllipse", "diameter.3gpp.highaccuracyellipsoidpointwithuncertaintyellipse_bit7",
+          FT_BOOLEAN, 32, TFS(&tfs_supported_not_supported), 0x00000080,
+          NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_ellipsoidarc_bit6,
+        { "ellipsoidArc", "diameter.3gpp.ellipsoidarc_bit6",
+          FT_BOOLEAN, 32, TFS(&tfs_supported_not_supported), 0x00000040,
+          NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_ellipsoidpointwithaltitudeanduncertaintyelipsoid_bit5,
+        { "ellipsoidPointWithAltitudeAndUncertaintyElipsoid", "diameter.3gpp.ellipsoidpointwithaltitudeanduncertaintyelipsoid_bit5",
+          FT_BOOLEAN, 32, TFS(&tfs_supported_not_supported), 0x00000020,
+          NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_ellipsoidpointwithaltitude_bit4,
+        { "ellipsoidPointWithAltitude", "diameter.3gpp.ellipsoidpointwithaltitude_bit4",
+          FT_BOOLEAN, 32, TFS(&tfs_supported_not_supported), 0x00000010,
+          NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_polygon_bit3,
+        { "polygon", "diameter.3gpp.polygon_bit3",
+          FT_BOOLEAN, 32, TFS(&tfs_supported_not_supported), 0x00000008,
+          NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_ellipsoidpointwithuncertaintyellipse_bit2,
+        { "ellipsoidPointWithUncertaintyEllipse", "diameter.3gpp.ellipsoidpointwithuncertaintyellipse_bit2",
+          FT_BOOLEAN, 32, TFS(&tfs_supported_not_supported), 0x00000004,
+          NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_ellipsoidpointwithuncertaintycircle_bit1,
+        { "ellipsoidPointWithUncertaintyCircle", "diameter.3gpp.ellipsoidpointwithuncertaintycircle_bit1",
+          FT_BOOLEAN, 32, TFS(&tfs_supported_not_supported), 0x00000002,
+          NULL, HFILL }
+        },
+        { &hf_diameter_3gpp_ellipsoidpoint_bit0,
+        { "ellipsoidPoint", "diameter.3gpp.ellipsoidpoint_bit0",
+          FT_BOOLEAN, 32, TFS(&tfs_supported_not_supported), 0x00000001,
+          NULL, HFILL }
+        },
+
         { &hf_diameter_3gpp_plr_flags,
         { "PLR-Flags", "diameter.3gpp.plr_flags",
           FT_UINT32, BASE_HEX, NULL, 0x0,
@@ -5676,6 +5860,7 @@ proto_register_diameter_3gpp(void)
         &diameter_3gpp_tmgi_allocation_result_ett,
         &diameter_3gpp_tmgi_deallocation_result_ett,
         &diameter_3gpp_sar_flags_ett,
+        &diameter_3gpp_req_nodes_ett,
         &diameter_3gpp_emergency_services_flags_ett,
         &diameter_3gpp_pur_flags_ett,
         &diameter_3gpp_clr_flags_ett,
@@ -5688,6 +5873,7 @@ proto_register_diameter_3gpp(void)
         &diameter_3gpp_preferred_data_mode_ett,
         &diameter_3gpp_v2x_permission_ett,
         &diameter_3gpp_core_network_restrictions_ett,
+        &diameter_3gpp_supported_gad_shapes_ett,
         &diameter_3gpp_plr_flags_ett,
         &diameter_3gpp_pla_flags_ett,
         &diameter_3gpp_deferred_location_type_ett,

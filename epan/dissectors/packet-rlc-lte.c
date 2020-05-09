@@ -2449,7 +2449,7 @@ static void dissect_rlc_lte_am_status_pdu(tvbuff_t *tvb,
             /* Reset this flag here */
             e2 = 0;
         }
-    } while (e1 || e2);
+    } while (e1);
 
     if (nack_count > 0) {
         proto_item *count_ti = proto_tree_add_uint(tree, hf_rlc_lte_am_nacks, tvb, 0, 1, nack_count);
@@ -2915,7 +2915,7 @@ static void dissect_rlc_lte_common(tvbuff_t *tvb, packet_info *pinfo, proto_tree
     proto_item             *ti;
     proto_item             *mode_ti;
     gint                   offset = 0;
-    struct rlc_lte_info    *p_rlc_lte_info = NULL;
+    struct rlc_lte_info    *p_rlc_lte_info;
 
     /* Allocate and Zero tap struct */
     rlc_lte_tap_info *tap_info = wmem_new0(wmem_packet_scope(), rlc_lte_tap_info);

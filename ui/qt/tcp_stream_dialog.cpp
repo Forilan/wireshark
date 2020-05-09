@@ -74,6 +74,23 @@ const QString sequence_number_label_ = QObject::tr("Sequence Number (B)");
 const QString time_s_label_ = QObject::tr("Time (s)");
 const QString window_size_label_ = QObject::tr("Window Size (B)");
 
+QCPErrorBarsNotSelectable::QCPErrorBarsNotSelectable(QCPAxis *keyAxis, QCPAxis *valueAxis) :
+    QCPErrorBars(keyAxis, valueAxis)
+{
+}
+
+QCPErrorBarsNotSelectable::~QCPErrorBarsNotSelectable()
+{
+}
+
+double QCPErrorBarsNotSelectable::selectTest(const QPointF &pos, bool onlySelectable, QVariant *details) const
+{
+    Q_UNUSED(pos);
+    Q_UNUSED(onlySelectable);
+    Q_UNUSED(details);
+    return -1.0;
+}
+
 TCPStreamDialog::TCPStreamDialog(QWidget *parent, capture_file *cf, tcp_graph_type graph_type) :
     GeometryStateDialog(parent),
     ui(new Ui::TCPStreamDialog),
@@ -106,23 +123,16 @@ TCPStreamDialog::TCPStreamDialog(QWidget *parent, capture_file *cf, tcp_graph_ty
     num_sack_ranges_(-1),
     ma_window_size_(1.0)
 {
-    struct segment current;
     int graph_idx = -1;
+
+    memset(&graph_, 0, sizeof(graph_));
 
     ui->setupUi(this);
     if (parent) loadGeometry(parent->width() * 2 / 3, parent->height() * 4 / 5);
     setAttribute(Qt::WA_DeleteOnClose, true);
 
-    graph_.type = GRAPH_UNDEFINED;
-    set_address(&graph_.src_address, AT_NONE, 0, NULL);
-    graph_.src_port = 0;
-    set_address(&graph_.dst_address, AT_NONE, 0, NULL);
-    graph_.dst_port = 0;
-    graph_.stream = 0;
-    graph_.segments = NULL;
-
-    struct tcpheader *header = select_tcpip_session(cap_file_, &current);
-    if (!header) {
+    guint32 th_stream = select_tcpip_session(cap_file_);
+    if (th_stream == G_MAXUINT32) {
         done(QDialog::Rejected);
         return;
     }
@@ -177,13 +187,8 @@ TCPStreamDialog::TCPStreamDialog(QWidget *parent, capture_file *cf, tcp_graph_ty
     ctx_menu_.addAction(ui->actionWindowScaling);
     set_action_shortcuts_visible_in_context_menu(ctx_menu_.actions());
 
-    memset (&graph_, 0, sizeof(graph_));
     graph_.type = graph_type;
-    copy_address(&graph_.src_address, &current.ip_src);
-    graph_.src_port = current.th_sport;
-    copy_address(&graph_.dst_address, &current.ip_dst);
-    graph_.dst_port = current.th_dport;
-    graph_.stream = header->th_stream;
+    graph_.stream = th_stream;
     findStream();
 
     showWidgetsForGraphType();
@@ -247,7 +252,7 @@ TCPStreamDialog::TCPStreamDialog(QWidget *parent, capture_file *cf, tcp_graph_ty
     seg_graph_ = sp->addGraph();
     seg_graph_->setLineStyle(QCPGraph::lsNone);
     seg_graph_->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDot, Qt::transparent, 0));
-    seg_eb_ = new QCPErrorBars(sp->xAxis, sp->yAxis);
+    seg_eb_ = new QCPErrorBarsNotSelectable(sp->xAxis, sp->yAxis);
     seg_eb_->setErrorType(QCPErrorBars::etValueError);
     seg_eb_->setPen(QPen(QBrush(graph_color_1), pen_width));
     seg_eb_->setSymbolGap(0.0); // draw error spine as single line
@@ -264,7 +269,7 @@ TCPStreamDialog::TCPStreamDialog(QWidget *parent, capture_file *cf, tcp_graph_ty
     sack_graph_ = sp->addGraph();
     sack_graph_->setLineStyle(QCPGraph::lsNone);
     sack_graph_->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDot, Qt::transparent, 0));
-    sack_eb_ = new QCPErrorBars(sp->xAxis, sp->yAxis);
+    sack_eb_ = new QCPErrorBarsNotSelectable(sp->xAxis, sp->yAxis);
     sack_eb_->setErrorType(QCPErrorBars::etValueError);
     sack_eb_->setPen(QPen(QBrush(graph_color_4), pen_width));
     sack_eb_->setSymbolGap(0.0); // draw error spine as single line
@@ -276,7 +281,7 @@ TCPStreamDialog::TCPStreamDialog(QWidget *parent, capture_file *cf, tcp_graph_ty
     sack2_graph_ = sp->addGraph();
     sack2_graph_->setLineStyle(QCPGraph::lsNone);
     sack2_graph_->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDot, Qt::transparent, 0));
-    sack2_eb_ = new QCPErrorBars(sp->xAxis, sp->yAxis);
+    sack2_eb_ = new QCPErrorBarsNotSelectable(sp->xAxis, sp->yAxis);
     sack2_eb_->setErrorType(QCPErrorBars::etValueError);
     sack2_eb_->setPen(QPen(QBrush(graph_color_5), pen_width));
     sack2_eb_->setSymbolGap(0.0); // draw error spine as single line
@@ -352,6 +357,8 @@ TCPStreamDialog::TCPStreamDialog(QWidget *parent, capture_file *cf, tcp_graph_ty
 
 TCPStreamDialog::~TCPStreamDialog()
 {
+    graph_segment_list_free(&graph_);
+
     delete ui;
 }
 
@@ -501,7 +508,7 @@ void TCPStreamDialog::findStream()
         ui->streamNumberSpinBox->clearFocus();
     ui->streamNumberSpinBox->setEnabled(false);
     graph_segment_list_free(&graph_);
-    graph_segment_list_get(cap_file_, &graph_, TRUE);
+    graph_segment_list_get(cap_file_, &graph_);
     ui->streamNumberSpinBox->setEnabled(true);
     if (spin_box_focused)
         ui->streamNumberSpinBox->setFocus();
@@ -2085,10 +2092,13 @@ void TCPStreamDialog::on_actionSwitchDirection_triggered()
 
     copy_address(&tmp_addr, &graph_.src_address);
     tmp_port = graph_.src_port;
+    free_address(&graph_.src_address);
     copy_address(&graph_.src_address, &graph_.dst_address);
     graph_.src_port = graph_.dst_port;
+    free_address(&graph_.dst_address);
     copy_address(&graph_.dst_address, &tmp_addr);
     graph_.dst_port = tmp_port;
+    free_address(&tmp_addr);
 
     fillGraph(/*reset_axes=*/true, /*set_focus=*/false);
 }
@@ -2178,8 +2188,6 @@ void TCPStreamDialog::GraphUpdater::doUpdate()
         if ((int(dialog_->graph_.stream) != new_stream) &&
             (new_stream >= 0 && new_stream < int(get_tcp_stream_count()))) {
             dialog_->graph_.stream = new_stream;
-            clear_address(&dialog_->graph_.src_address);
-            clear_address(&dialog_->graph_.dst_address);
             dialog_->findStream();
         }
         dialog_->fillGraph(reset_axes, /*set_focus =*/false);

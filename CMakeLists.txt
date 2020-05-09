@@ -1509,10 +1509,6 @@ foreach(_plugin_src_dir ${PLUGIN_SRC_DIRS})
 	add_subdirectory( ${_plugin_src_dir} )
 endforeach()
 
-if(ENABLE_PCAP_NG_DEFAULT)
-	set(PCAP_NG_DEFAULT 1)
-endif()
-
 # Large file support (e.g. make off_t 64 bit if supported)
 include(gmxTestLargeFiles)
 gmx_test_large_files(GMX_LARGEFILES)
@@ -2916,34 +2912,32 @@ if(ENABLE_APPLICATION_BUNDLE)
 	)
 	add_dependencies(app_bundle ${PROGLIST} chmodbpf path_helper)
 
-	if( DMGBUILD_EXECUTABLE AND ASCIIDOCTOR_FOUND)
-		add_custom_target(dmg_package_prep DEPENDS app_bundle)
+	add_custom_target(dmg_package_prep DEPENDS app_bundle)
 
-		set(_read_me_first "packaging/macosx/Read me first.html")
-		ADD_CUSTOM_COMMAND(
-		OUTPUT
-			${_read_me_first}
-		COMMAND ${ASCIIDOCTOR_EXECUTABLE}
-			--backend html
-			--out-file ${_read_me_first}
-			--attribute include-dir=${CMAKE_SOURCE_DIR}/docbook
-			--attribute min-macos-version=${MIN_MACOS_VERSION}
-			${CMAKE_CURRENT_SOURCE_DIR}/packaging/macosx/Read_me_first.adoc
-		DEPENDS
-			${CMAKE_CURRENT_SOURCE_DIR}/packaging/macosx/Read_me_first.adoc
-		)
-		add_custom_target(read_me_first_html DEPENDS ${_read_me_first} )
-		add_dependencies(dmg_package_prep read_me_first_html)
+	set(_read_me_first "packaging/macosx/Read me first.html")
+	ADD_CUSTOM_COMMAND(
+	OUTPUT
+		${_read_me_first}
+	COMMAND ${ASCIIDOCTOR_EXECUTABLE}
+		--backend html
+		--out-file ${_read_me_first}
+		--attribute include-dir=${CMAKE_SOURCE_DIR}/docbook
+		--attribute min-macos-version=${MIN_MACOS_VERSION}
+		${CMAKE_CURRENT_SOURCE_DIR}/packaging/macosx/Read_me_first.adoc
+	DEPENDS
+		${CMAKE_CURRENT_SOURCE_DIR}/packaging/macosx/Read_me_first.adoc
+	)
+	add_custom_target(read_me_first_html DEPENDS ${_read_me_first} )
+	add_dependencies(dmg_package_prep read_me_first_html)
 
-		ADD_CUSTOM_TARGET( dmg_package
-			COMMAND bash -x ${CMAKE_BINARY_DIR}/packaging/macosx/osx-dmg.sh
-			# Unlike nsis_package_prep + nsis_package, we can add a direct
-			# dependency here.
-			DEPENDS dmg_package_prep
-			# We create Wireshark.app in "run". Do our work there.
-			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/run
-		)
-	endif()
+	ADD_CUSTOM_TARGET( dmg_package
+		COMMAND bash -x ${CMAKE_BINARY_DIR}/packaging/macosx/osx-dmg.sh
+		# Unlike nsis_package_prep + nsis_package, we can add a direct
+		# dependency here.
+		DEPENDS dmg_package_prep
+		# We create Wireshark.app in "run". Do our work there.
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/run
+	)
 
 endif()
 
@@ -3220,6 +3214,7 @@ endif()
 install(
 	FILES
 		${CMAKE_MODULE_PATH}/FindGLIB2.cmake
+		${CMAKE_MODULE_PATH}/FindWSLibrary.cmake
 		${CMAKE_MODULE_PATH}/FindWSWinLibs.cmake
 		${CMAKE_MODULE_PATH}/UseAsn2Wrs.cmake
 		${CMAKE_MODULE_PATH}/LocatePythonModule.cmake
@@ -3338,6 +3333,7 @@ set(_test_group_list
 	suite_mergecap
 	suite_nameres
 	suite_outputformats
+	suite_release
 	suite_text2pcap
 	suite_sharkd
 	suite_unittests
