@@ -2683,9 +2683,13 @@ dis_msg_status_report(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
     {
         return;
     }
-    pi = tvb_get_guint8(tvb, offset);
 
+    /* Read Parameter Indicator byte */
+    pi = tvb_get_guint8(tvb, offset);
     dis_field_pi(tvb, tree, offset);
+    offset++;
+
+    /* TODO: (9.2.3.27) If a Reserved bit is set to "1" then the receiving entity shall ignore the setting */
 
     if (pi & 0x01)
     {
@@ -2696,10 +2700,9 @@ dis_msg_status_report(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
             return;
         }
 
-        offset++;
         oct = tvb_get_guint8(tvb, offset);
-
         dis_field_pid(tvb, tree, offset, oct);
+        offset++;
     }
 
     if (pi & 0x02)
@@ -2711,10 +2714,9 @@ dis_msg_status_report(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
             return;
         }
 
-        offset++;
         oct = tvb_get_guint8(tvb, offset);
-
         dis_field_dcs(tvb, tree, offset, oct, &seven_bit, &eight_bit, &ucs2, &compressed);
+        offset++;
     }
 
     if (pi & 0x04)
@@ -2726,17 +2728,15 @@ dis_msg_status_report(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
             return;
         }
 
-        offset++;
         oct = tvb_get_guint8(tvb, offset);
         udl = oct;
 
         DIS_FIELD_UDL(tree, offset);
+        offset++;
     }
 
     if (udl > 0)
     {
-        offset++;
-
         dis_field_ud(tvb, pinfo, tree, offset, length - (offset - saved_offset), udhi, udl,
             seven_bit, eight_bit, ucs2, compressed, data);
     }
