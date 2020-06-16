@@ -798,7 +798,7 @@ dissect_btle(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data)
         }
         case 0x01: /* ADV_DIRECT_IND */
         case 0x05: /* CONNECT_IND or AUX_CONNECT_REQ */
-            if (!(btle_context->channel < 37)) {
+            if (btle_context && btle_context->channel >= 37) {
                 /* CONNECT_IND */
                 ch_sel_valid = TRUE;
             }
@@ -1214,7 +1214,7 @@ dissect_btle(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data)
 
             if (flags & 0x40) {
                 /* Tx Power */
-                item = proto_tree_add_item(ext_header_tree, hf_extended_advertising_tx_power, tvb, offset, 1, ENC_LITTLE_ENDIAN);
+                proto_tree_add_item(ext_header_tree, hf_extended_advertising_tx_power, tvb, offset, 1, ENC_LITTLE_ENDIAN);
                 offset += 1;
 
                 acad_len -= 1;

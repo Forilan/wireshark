@@ -196,6 +196,12 @@ uat_wep_key_record_update_cb(void* r, char** err)
           return FALSE;
         }
         break;
+      case DOT11DECRYPT_KEY_TYPE_TK:
+        if (rec->key != DOT11DECRYPT_KEY_TYPE_TK) {
+          *err = g_strdup("Invalid TK key format");
+          return FALSE;
+        }
+        break;
       default:
         *err = g_strdup("Invalid key format");
         return FALSE;
@@ -237,7 +243,7 @@ static void try_scan_tdls_keys(tvbuff_t *tvb, packet_info *pinfo, int offset);
 
 static tvbuff_t *
 try_decrypt(tvbuff_t *tvb, packet_info *pinfo, guint offset, guint len,
-            guint8 *algorithm, guint32 *sec_header, guint32 *sec_trailer,
+            guint8 *algorithm, guint32 *sec_trailer,
             PDOT11DECRYPT_KEY_ITEM used_key);
 
 static int weak_iv(guchar *iv);
@@ -577,6 +583,7 @@ const value_string ie_tag_num_vals[] = {
   { TAG_FILS_INDICATION,                      "FILS Indication"},
   { TAG_DIFF_INITIAL_LINK_SETUP,              "Differential Initial Link Setup"},
   { TAG_FRAGMENT,                             "Fragment"},
+  { TAG_RSNX,                                 "RSN eXtension"},
   { TAG_ELEMENT_ID_EXTENSION,                 "Element ID Extension" },
   { 0, NULL }
 };
@@ -724,6 +731,12 @@ static const value_string ieee80211_supported_rates_vals[] = {
   { 0xC8, "36(B)" },
   { 0xE0, "48(B)" },
   { 0xEC, "54(B)" },
+  /* BSS membership selector */
+  { 0xFA, "SAE Hash to Element Only" },
+  { 0xFB, "EPD" }, /* 802.11ak */
+  { 0xFC, "GLK" }, /* 802.11ak */
+  { 0xFD, "VHT PHY" },
+  { 0xFE, "HT PHY" },
   { 0xFF, "BSS requires support for mandatory features of HT PHY (IEEE 802.11 - Clause 20)" },
   { 0,    NULL}
 };
@@ -1282,6 +1295,7 @@ static value_string_ext aruba_mgt_typevals_ext = VALUE_STRING_EXT_INIT(aruba_mgt
 #define ANQP_INFO_VENUE_URL                      277
 #define ANQP_INFO_ADVICE_OF_CHARGE               278
 #define ANQP_INFO_LOCAL_CONTENT                  279
+#define ANQP_INFO_NETWORK_AUTH_TYPE_TIMESTAMP    280
 #define ANQP_INFO_ANQP_VENDOR_SPECIFIC_LIST    56797
 
 /* ANQP information ID - IEEE Std 802.11u-2011 - Table 7-43bk */
@@ -1312,6 +1326,8 @@ static const value_string anqp_info_id_vals[] = {
   {ANQP_INFO_VENUE_URL, "Venue URL"},
   {ANQP_INFO_ADVICE_OF_CHARGE, "Advice of Charge"},
   {ANQP_INFO_LOCAL_CONTENT, "Local Content"},
+  {ANQP_INFO_NETWORK_AUTH_TYPE_TIMESTAMP,
+   "Network Authentication Type with Timestamp"},
   {ANQP_INFO_ANQP_VENDOR_SPECIFIC_LIST, "ANQP vendor-specific list"},
   {0, NULL}
 };
@@ -2788,6 +2804,7 @@ static const value_string wep_type_vals[] = {
   { DOT11DECRYPT_KEY_TYPE_WEP, STRING_KEY_TYPE_WEP },
   { DOT11DECRYPT_KEY_TYPE_WPA_PWD, STRING_KEY_TYPE_WPA_PWD },
   { DOT11DECRYPT_KEY_TYPE_WPA_PSK, STRING_KEY_TYPE_WPA_PSK },
+  { DOT11DECRYPT_KEY_TYPE_TK, STRING_KEY_TYPE_TK },
   { 0x00, NULL }
 };
 
@@ -3500,6 +3517,17 @@ static int hf_ieee80211_ff_anqp_venue_name = -1;
 static int hf_ieee80211_ff_anqp_nw_auth_type_indicator = -1;
 static int hf_ieee80211_ff_anqp_nw_auth_type_url_len = -1;
 static int hf_ieee80211_ff_anqp_nw_auth_type_url = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_indicator = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_url_len = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_url = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_year = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_mon = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_day = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_hr = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_min = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_sec = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_msec = -1;
+static int hf_ieee80211_ff_anqp_nw_auth_type_ts_rsvd = -1;
 static int hf_ieee80211_ff_anqp_roaming_consortium_oi_len = -1;
 static int hf_ieee80211_ff_anqp_roaming_consortium_oi = -1;
 static int hf_ieee80211_ff_anqp_ip_addr_avail_ipv6 = -1;
@@ -5894,6 +5922,13 @@ static int hf_ieee80211_tag_twt_nom_min_twt_wake_dur = -1;
 static int hf_ieee80211_tag_twt_wake_interval_mantissa = -1;
 static int hf_ieee80211_tag_twt_channel = -1;
 
+static int hf_ieee80211_tag_rsnx_length = -1;
+static int hf_ieee80211_tag_rsnx_protected_twt_operations_support = -1;
+static int hf_ieee80211_tag_rsnx_sae_hash_to_element = -1;
+static int hf_ieee80211_tag_rsnx_reserved_b6b7 = -1;
+static int hf_ieee80211_tag_rsnx_reserved = -1;
+
+
 /* ************************************************************************* */
 /*                              RFC 8110 fields                              */
 /* ************************************************************************* */
@@ -6387,7 +6422,7 @@ static const val64_string number_of_taps_values[] = {
   {0, NULL}
 };
 
-DOT11DECRYPT_CONTEXT dot11decrypt_ctx;
+DOT11DECRYPT_CONTEXT dot11decrypt_ctx = { 0 };
 
 #define PSMP_STA_INFO_BROADCAST 0
 #define PSMP_STA_INFO_MULTICAST 1
@@ -7517,6 +7552,55 @@ dissect_network_auth_type(proto_tree *tree, tvbuff_t *tvb, int offset, int end)
 }
 
 static void
+dissect_anqp_network_auth_type_timestamp(proto_tree *tree, tvbuff_t *tvb, int offset, int end)
+{
+  while (offset + 2 <= end) {
+    guint8 len;
+    proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_indicator,
+                        tvb, offset, 1, ENC_NA);
+    len = tvb_get_guint8(tvb, offset + 1);
+    proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_url_len,
+                        tvb, offset, 1, ENC_NA);
+    offset += 2;
+    if(len)
+      proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_url,
+                          tvb, offset, len, ENC_ASCII|ENC_NA);
+    offset += len;
+    /* Optional Time Value - Either 0 or 10 octets */
+    /* Format: Octet 0-1: Year (0-65534)
+               Octet 2: Month (0-12)
+               Octet 3: Day of month (0-31)
+               Octet 4: Hours (0-23)
+               Octet 5: Minutes (0-59)
+               Octet 6: Seconds (0-59)
+               Octet 7-8: Milliseconds (0-999)
+               Octet 9: Reserved */
+    if ((offset + 10) < end) {
+      /* Enough bytes to dissect a timestamp */
+      proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_year,
+                          tvb, offset, 2, ENC_LITTLE_ENDIAN);
+      proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_mon,
+                          tvb, offset, 1, ENC_NA);
+      proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_day,
+                          tvb, offset, 1, ENC_NA);
+      proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_hr,
+                          tvb, offset, 1, ENC_NA);
+      proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_min,
+                          tvb, offset, 1, ENC_NA);
+      proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_sec,
+                          tvb, offset, 1, ENC_NA);
+      proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_msec,
+                          tvb, offset, 2, ENC_NA);
+      proto_tree_add_item(tree, hf_ieee80211_ff_anqp_nw_auth_type_ts_rsvd,
+                          tvb, offset, 1, ENC_NA);
+      offset += 10;
+    } else {
+      /* Not enough bytes to dissect a timestamp */
+    }
+  }
+}
+
+static void
 add_manuf(proto_item *item, tvbuff_t *tvb, int offset)
 {
   const gchar *manuf_name;
@@ -7585,6 +7669,51 @@ static const value_string nai_realm_encoding_vals[] = {
   { 0, "Formatted in accordance with RFC 4282" },
   { 1, "UTF-8 formatted that is not formatted in accordance with RFC 4282" },
   { 0, NULL }
+};
+
+static const range_string hs20_oper_class_rvals[] = {
+  {   0,   0, "Unknown" }, /* 0 should not be used */
+  {   1,  80, "Reserved" },
+  {  81,  81, "2.407 GHz, Channels 1-13, 25 MHz Spacing" },
+  {  82,  82, "2.414 GHz, Channel 14, 25 MHz Spacing" },
+  {  83,  83, "2.407 GHz, Channels 1-9, 40 MHz Spacing" },
+  {  84,  84, "2.407 GHz, Channels 5-13, 40 MHz Spacing" },
+  {  85,  93, "Reserved" },
+  {  94,  94, "3.0 GHz, Channels 133 and 137, 20 MHz Spacing" },
+  {  95,  95, "3.0 GHz, Channels 132, 134, 136, and 138, 10 MHz Spacing" },
+  {  96,  96, "3.0025 GHz, Channels 131-138, 5 MHz Spacing" },
+  {  97, 100, "Reserved" },
+  { 101, 101, "4.85 GHz, Channels 21 and 25, 20 MHz Spacing" },
+  { 102, 102, "4.89 GHz, Channels 11, 13, 15, 17, and 19, 10 MHz Spacing" },
+  { 103, 103, "4.9375 GHz, Channels 1-10, 5 MHz Spacing" },
+  { 104, 104, "4.0 GHz, Channels 184 and 192, 40 MHz Spacing" },
+  { 105, 105, "4.0 GHz, Channels 188 and 196, 40 MHz Spacing" },
+  { 106, 106, "4.0 GHz, Channels 191 and 195, 20 MHz Spacing" },
+  { 107, 107, "4.0 GHz, Channels 189, 191, 193, 195, and 197, 10 MHz Spacing" },
+  { 108, 108, "4.0025 GHz, Channels 188-197, 5 MHz Spacing" },
+  { 109, 109, "4.0 GHz, Channels 184, 188, 192, and 196, 20 MHz Spacing" },
+  { 110, 110, "4.0 GHz, Channels 183-189, 10 MHz Spacing" },
+  { 111, 111, "4.0025 GHz, Channels 182-189, 5 MHz Spacing" },
+  { 112, 112, "5.0 GHz, Channels 8, 12, and 16, 20 MHz Spacing" },
+  { 113, 113, "5.0 GHz, Channels 7-11, 10 MHz Spacing" },
+  { 114, 114, "5.0 GHz, Channels 6-11, 5 MHz Spacing" },
+  { 115, 115, "5.0 GHz, Channels 36, 40, 44, and 48, 20 MHz Spacing" },
+  { 116, 116, "5.0 GHz, Channels 36 and 44, 40 MHz Spacing" },
+  { 117, 117, "5.0 GHz, Channels 40 and 48, 40 MHz Spacing" },
+  { 118, 118, "5.0 GHz, Channels 52, 56, 60, and 64, 20 MHz Spacing" },
+  { 119, 119, "5.0 GHz, Channels 52 and 60, 40 MHz Spacing" },
+  { 120, 120, "5.0 GHz, Channels 56 and 64, 40 MHz Spacing" },
+  { 121, 121, "5.0 GHz, Channels 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, and 140, 20 MHz Spacing" },
+  { 122, 122, "5.0 GHz, Channels 100, 108, 116, 124, and 132, 40 MHz Spacing" },
+  { 123, 123, "5.0 GHz, Channels 104, 112, 120, 128, and 136, 40 MHz Spacing" },
+  { 124, 124, "5.0 GHz, Channels 149, 153, 157, and 161, 20 MHz Spacing" },
+  { 125, 125, "5.0 GHz, Channels 149, 153, 157, 161, 165, and 169, 20 MHz Spacing" },
+  { 126, 126, "5.0 GHz, Channels 149 and 157, 40 MHz Spacing" },
+  { 127, 127, "5.0 GHz, Channels 153 and 161, 40 MHz Spacing" },
+  { 128, 191, "Reserved" },
+  { 192, 254, "Vendor-Specific" },
+  { 255, 255, "Reserved" },
+  {   0,   0, NULL }
 };
 
 static const value_string nai_realm_auth_param_id_vals[] = {
@@ -7941,6 +8070,27 @@ dissect_hs20_anqp_wan_metrics(proto_tree *tree, tvbuff_t *tvb, int offset, gbool
                       tvb, offset, 2, ENC_LITTLE_ENDIAN);
 }
 
+static const value_string hs20_cc_proto_vals[] = {
+  {  1, "ICMP" },
+  {  6, "TCP" },
+  { 17, "UDP" },
+  { 50, "ESP" },
+  {  0, NULL }
+};
+
+static const value_string hs20_cc_port_vals[] = {
+  {    0, "[Supported]" }, /* Used to indicate ICMP, ESP for IPSec VPN, or IKEv2 for IPSec VPN */
+  {   20, "FTP" },
+  {   22, "SSH" },
+  {   80, "HTTP" },
+  {  443, "HTTPS" },
+  {  500, "IKEv2 for IPSec VPN" },
+  { 1723, "PPTP for IPSec VPN" },
+  { 4500, "[Optional] IKEv2 for IPSec VPN" },
+  { 5060, "VOIP" },
+  {    0, NULL },
+};
+
 static const value_string hs20_cc_status_vals[] = {
   { 0, "Closed" },
   { 1, "Open" },
@@ -7962,10 +8112,10 @@ dissect_hs20_anqp_connection_capability(proto_tree *tree, tvbuff_t *tvb,
     status = tvb_get_guint8(tvb, offset + 3);
 
     tuple = proto_tree_add_subtree_format(tree, tvb, offset, 4, ett_hs20_cc_proto_port_tuple, NULL,
-                               "ProtoPort Tuple - ip_proto=%u port_num=%u status=%s",
-                               ip_proto, port_num,
-                               val_to_str(status, hs20_cc_status_vals,
-                                          "Reserved (%u)"));
+                               "ProtoPort Tuple - ip_proto=%s port_num=%s status=%s",
+                               val_to_str(ip_proto, hs20_cc_proto_vals, "Unknown (%u)"),
+                               val_to_str(port_num, hs20_cc_port_vals, "Unknown (%u)"),
+                               val_to_str(status, hs20_cc_status_vals, "Reserved (%u)"));
     proto_tree_add_item(tuple, hf_ieee80211_hs20_anqp_cc_proto_ip_proto,
                         tvb, offset, 1, ENC_LITTLE_ENDIAN);
     offset++;
@@ -8730,6 +8880,9 @@ dissect_anqp_info(proto_tree *tree, tvbuff_t *tvb, packet_info *pinfo, int offse
     break;
   case ANQP_INFO_ADVICE_OF_CHARGE:
     dissect_hs20_anqp_advice_of_charge(tree, tvb, offset, offset + len);
+    break;
+  case ANQP_INFO_NETWORK_AUTH_TYPE_TIMESTAMP:
+    dissect_anqp_network_auth_type_timestamp(tree, tvb, offset, offset + len);
     break;
   default:
     proto_tree_add_item(tree, hf_ieee80211_ff_anqp_info,
@@ -22065,6 +22218,43 @@ ieee80211_tag_twt(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void* dat
   return tvb_captured_length(tvb);
 }
 
+
+static int
+ieee80211_tag_rsnx(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void* data)
+{
+  int tag_len = tvb_reported_length(tvb);
+  ieee80211_tagged_field_data_t* field_data = (ieee80211_tagged_field_data_t*)data;
+  int offset = 0;
+
+  if (tag_len < 1)
+  {
+    expert_add_info_format(pinfo, field_data->item_tag_length, &ei_ieee80211_tag_length, "Tag Length %u wrong, must be >= 1", tag_len);
+    return tvb_captured_length(tvb);
+  }
+
+
+  proto_tree_add_item(tree, hf_ieee80211_tag_rsnx_length, tvb, offset, 1,
+                      ENC_LITTLE_ENDIAN);
+
+  proto_tree_add_item(tree, hf_ieee80211_tag_rsnx_protected_twt_operations_support, tvb, offset, 1,
+                      ENC_LITTLE_ENDIAN);
+
+  proto_tree_add_item(tree, hf_ieee80211_tag_rsnx_sae_hash_to_element, tvb, offset, 1,
+                      ENC_LITTLE_ENDIAN);
+  proto_tree_add_item(tree, hf_ieee80211_tag_rsnx_reserved_b6b7, tvb, offset, 1,
+                      ENC_LITTLE_ENDIAN);
+  offset += 1;
+
+  /* all rest of payload is reserved... */
+  while (offset < tag_len) {
+    proto_tree_add_item(tree, hf_ieee80211_tag_rsnx_reserved, tvb, offset, 1,
+                        ENC_LITTLE_ENDIAN);
+    offset += 1;
+  }
+
+  return tvb_captured_length(tvb);
+}
+
 static int
 ieee80211_tag_fils_indication(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void* data)
 {
@@ -24743,7 +24933,6 @@ dissect_ieee80211_common(tvbuff_t *tvb, packet_info *pinfo,
   ((tvb_get_guint8(tvb, hdr_len) | 0x20) & 0x7f))
 #define IS_CCMP(tvb, hdr_len)  (tvb_get_guint8(tvb, hdr_len + 2) == 0)
   guint8 algorithm=G_MAXUINT8;
-  guint32 sec_header=0;
   guint32 sec_trailer=0;
 
   p_add_proto_data(wmem_file_scope(), pinfo, proto_wlan, IS_DMG_KEY, GINT_TO_POINTER(isDMG));
@@ -25865,11 +26054,11 @@ dissect_ieee80211_common(tvbuff_t *tvb, packet_info *pinfo,
     proto_tree *wep_tree    = NULL;
     guint32     iv;
     guint8      wep_key, keybyte;
-    DOT11DECRYPT_KEY_ITEM  used_key;
+    DOT11DECRYPT_KEY_ITEM  used_key = { 0 };
 
     if (len == reported_len) {
       next_tvb = try_decrypt(tvb, pinfo, hdr_len, reported_len,
-                             &algorithm, &sec_header, &sec_trailer, &used_key);
+                             &algorithm, &sec_trailer, &used_key);
     }
 
     keybyte = tvb_get_guint8(tvb, hdr_len + 3);
@@ -25959,10 +26148,13 @@ dissect_ieee80211_common(tvbuff_t *tvb, packet_info *pinfo,
             proto_item_set_generated(ti);
 
             /* Also add the PMK used to to decrypt the packet. (PMK==PSK) */
-            bytes_to_hexstr(out_buff, used_key.KeyData.Wpa.Psk, used_key.KeyData.Wpa.PskLen);
-            out_buff[2*used_key.KeyData.Wpa.PskLen] = '\0';
-            ti = proto_tree_add_string(wep_tree, hf_ieee80211_fc_analysis_pmk, tvb, 0, 0, out_buff);
-            proto_item_set_generated(ti);
+            if (used_key.KeyData.Wpa.PskLen > 0) {
+
+              bytes_to_hexstr(out_buff, used_key.KeyData.Wpa.Psk, used_key.KeyData.Wpa.PskLen);
+              out_buff[2*used_key.KeyData.Wpa.PskLen] = '\0';
+              ti = proto_tree_add_string(wep_tree, hf_ieee80211_fc_analysis_pmk, tvb, 0, 0, out_buff);
+              proto_item_set_generated(ti);
+            }
 
           } else { /* Encrypted with Group Key */
             key_len = Dot11DecryptGetGTK(&used_key, &key);
@@ -27081,10 +27273,10 @@ static void try_scan_tdls_keys(tvbuff_t *tvb, packet_info *pinfo _U_, int offset
   }
 }
 
-/* It returns the algorithm used for decryption and the header and trailer lengths. */
+/* It returns the algorithm used for decryption and trailer length. */
 static tvbuff_t *
 try_decrypt(tvbuff_t *tvb, packet_info *pinfo, guint offset, guint len,
-            guint8 *algorithm, guint32 *sec_header, guint32 *sec_trailer,
+            guint8 *algorithm, guint32 *sec_trailer,
             PDOT11DECRYPT_KEY_ITEM used_key)
 {
   const guint8      *enc_data;
@@ -27106,24 +27298,19 @@ try_decrypt(tvbuff_t *tvb, packet_info *pinfo, guint offset, guint len,
     *algorithm=used_key->KeyType;
     switch (*algorithm) {
       case DOT11DECRYPT_KEY_TYPE_WEP:
-        *sec_header=DOT11DECRYPT_WEP_HEADER;
         *sec_trailer=DOT11DECRYPT_WEP_TRAILER;
         break;
       case DOT11DECRYPT_KEY_TYPE_CCMP:
-        *sec_header=DOT11DECRYPT_RSNA_HEADER;
         *sec_trailer=DOT11DECRYPT_CCMP_TRAILER;
         break;
       case DOT11DECRYPT_KEY_TYPE_CCMP_256:
-        *sec_header = DOT11DECRYPT_RSNA_HEADER;
         *sec_trailer = DOT11DECRYPT_CCMP_256_TRAILER;
         break;
       case DOT11DECRYPT_KEY_TYPE_GCMP:
       case DOT11DECRYPT_KEY_TYPE_GCMP_256:
-        *sec_header = DOT11DECRYPT_RSNA_HEADER;
         *sec_trailer = DOT11DECRYPT_GCMP_TRAILER;
         break;
       case DOT11DECRYPT_KEY_TYPE_TKIP:
-        *sec_header=DOT11DECRYPT_RSNA_HEADER;
         *sec_trailer=DOT11DECRYPT_TKIP_TRAILER;
         break;
       default:
@@ -27158,7 +27345,7 @@ set_dot11decrypt_keys(void)
 
     if (dk != NULL)
     {
-      DOT11DECRYPT_KEY_ITEM          key;
+      DOT11DECRYPT_KEY_ITEM key = { 0 };
       if (dk->type == DOT11DECRYPT_KEY_TYPE_WEP)
       {
         gboolean res;
@@ -27213,6 +27400,18 @@ set_dot11decrypt_keys(void)
           keys->Keys[keys->nKeys] = key;
           keys->nKeys += 1;
         }
+      }
+      else if (dk->type == DOT11DECRYPT_KEY_TYPE_TK)
+      {
+        key.KeyType = DOT11DECRYPT_KEY_TYPE_TK;
+
+        bytes = g_byte_array_new();
+        hex_str_to_bytes(dk->key->str, bytes, FALSE);
+
+        memcpy(key.Tk.Tk, bytes->data, bytes->len);
+        key.Tk.Len = bytes->len;
+        keys->Keys[keys->nKeys] = key;
+        keys->nKeys += 1;
       }
       free_key_string(dk);
       if (bytes) {
@@ -30984,8 +31183,64 @@ proto_register_ieee80211(void)
       NULL, HFILL }},
 
     {&hf_ieee80211_ff_anqp_nw_auth_type_url,
-     {"Re-direct URL", "wlan.fixed.anqp.nw_auth_type_url",
+     {"Re-direct URL", "wlan.fixed.anqp.nw_auth_type.url",
       FT_STRING, BASE_NONE, NULL, 0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_indicator,
+     {"Network Authentication Type w/ Timestamp Indicator",
+      "wlan.fixed.anqp.nw_auth_type_ts.indicator",
+      FT_UINT8, BASE_DEC, VALS(nw_auth_type_vals), 0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_url_len,
+     {"Re-direct URL Length", "wlan.fixed.anqp.nw_auth_type_ts.url_len",
+      FT_UINT8, BASE_DEC, NULL, 0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_url,
+     {"Re-direct URL", "wlan.fixed.anqp.nw_auth_type_ts.url",
+      FT_STRING, BASE_NONE, NULL, 0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_year,
+     {"Timestamp (Year)", "wlan.fixed.anqp.nw_auth_type_ts.year",
+      FT_UINT16, BASE_DEC, NULL, 0x0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_mon,
+     {"Timestamp (Month)", "wlan.fixed.anqp.nw_auth_type_ts.mon",
+      FT_UINT8, BASE_DEC, NULL, 0x0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_day,
+     {"Timestamp (Day)", "wlan.fixed.anqp.nw_auth_type_ts.day",
+      FT_UINT8, BASE_DEC, NULL, 0x0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_hr,
+     {"Timestamp (Hours)", "wlan.fixed.anqp.nw_auth_type_ts.hr",
+      FT_UINT8, BASE_DEC, NULL, 0x0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_min,
+     {"Timestamp (Minutes)", "wlan.fixed.anqp.nw_auth_type_ts.min",
+      FT_UINT8, BASE_DEC, NULL, 0x0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_sec,
+     {"Timestamp (Seconds)", "wlan.fixed.anqp.nw_auth_type_ts.sec",
+      FT_UINT8, BASE_DEC, NULL, 0x0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_msec,
+     {"Timestamp (Milliseconds)", "wlan.fixed.anqp.nw_auth_type_ts.msec",
+      FT_UINT16, BASE_DEC, NULL, 0x0,
+      NULL, HFILL }},
+
+    {&hf_ieee80211_ff_anqp_nw_auth_type_ts_rsvd,
+     {"Timestamp (Reserved)", "wlan.fixed.anqp.nw_auth_type_ts.rsvd",
+      FT_UINT8, BASE_DEC, NULL, 0x0,
       NULL, HFILL }},
 
     {&hf_ieee80211_ff_anqp_roaming_consortium_oi_len,
@@ -31269,12 +31524,12 @@ proto_register_ieee80211(void)
 
     {&hf_ieee80211_hs20_anqp_cc_proto_ip_proto,
      {"IP Protocol", "wlan.hs20.anqp.cc.ip_proto",
-      FT_UINT8, BASE_DEC, NULL, 0,
+      FT_UINT8, BASE_DEC, VALS(hs20_cc_proto_vals), 0,
       "ProtoPort Tuple - IP Protocol", HFILL }},
 
     {&hf_ieee80211_hs20_anqp_cc_proto_port_num,
      {"Port Number", "wlan.hs20.anqp.cc.port_num",
-      FT_UINT16, BASE_DEC, NULL, 0,
+      FT_UINT16, BASE_DEC, VALS(hs20_cc_port_vals), 0,
       "ProtoPort Tuple - Port Number", HFILL }},
 
     {&hf_ieee80211_hs20_anqp_cc_proto_status,
@@ -31302,7 +31557,8 @@ proto_register_ieee80211(void)
 
     {&hf_ieee80211_hs20_anqp_oper_class_indic,
      {"Operating Class", "wlan.hs20.anqp.oper_class_indic.oper_class",
-      FT_UINT8, BASE_DEC, NULL, 0, NULL, HFILL }},
+      FT_UINT8, BASE_DEC | BASE_RANGE_STRING, RVALS(hs20_oper_class_rvals),
+      0, NULL, HFILL }},
 
     {&hf_ieee80211_hs20_osu_friendly_names_len,
      {"OSU Friendly Name Length", "wlan.hs20.osu_friendly_names_len",
@@ -38498,6 +38754,26 @@ proto_register_ieee80211(void)
       {"TWT Channel", "wlan.twt.channel",
        FT_UINT8, BASE_DEC, NULL, 0, NULL, HFILL }},
 
+    {&hf_ieee80211_tag_rsnx_length,
+      {"RSNX Length", "wlan.rsnx.length",
+       FT_UINT8, BASE_DEC, NULL, 0xF0, NULL, HFILL }},
+
+    {&hf_ieee80211_tag_rsnx_protected_twt_operations_support,
+      {"Protected TWT Operations Support", "wlan.rsnx.protected_twt_operations_support",
+       FT_UINT8, BASE_DEC, NULL, 0x08, NULL, HFILL }},
+
+    {&hf_ieee80211_tag_rsnx_sae_hash_to_element,
+      {"SAE Hash to element", "wlan.rsnx.sae_hash_to_element",
+       FT_UINT8, BASE_DEC, NULL, 0x04, NULL, HFILL }},
+
+    {&hf_ieee80211_tag_rsnx_reserved_b6b7,
+      {"Reserved", "wlan.rsnx.reserved",
+       FT_UINT8, BASE_HEX, NULL, 0x03, NULL, HFILL }},
+
+    {&hf_ieee80211_tag_rsnx_reserved,
+      {"Reserved", "wlan.rsnx.reserved",
+       FT_UINT8, BASE_HEX, NULL, 0x00, NULL, HFILL }},
+
     {&hf_ieee80211_owe_dh_parameter_group,
      {"Group", "wlan.ext_tag.owe_dh_parameter.group",
       FT_UINT32, BASE_DEC, VALS(owe_dh_parameter_group_vals), 0x0, NULL, HFILL }},
@@ -38526,7 +38802,8 @@ proto_register_ieee80211(void)
       UAT_FLD_CSTRING(uat_wep_key_records, string, "Key",
                         "wep:<wep hexadecimal key>\n"
                         "wpa-pwd:<passphrase>[:<ssid>]\n"
-                        "wpa-psk:<wpa hexadecimal key>"),
+                        "wpa-psk:<wpa hexadecimal key>\n"
+                        "tk:<hexadecimal key>\n"),
       UAT_END_FIELDS
     };
 
@@ -39502,6 +39779,7 @@ proto_reg_handoff_ieee80211(void)
   dissector_add_uint("wlan.tag.number", TAG_SWITCHING_STREAM, create_dissector_handle(ieee80211_tag_switching_stream, -1));
   dissector_add_uint("wlan.tag.number", TAG_ELEMENT_ID_EXTENSION, create_dissector_handle(ieee80211_tag_element_id_extension, -1));
   dissector_add_uint("wlan.tag.number", TAG_TWT, create_dissector_handle(ieee80211_tag_twt, -1));
+  dissector_add_uint("wlan.tag.number", TAG_RSNX, create_dissector_handle(ieee80211_tag_rsnx, -1));
 
   /* Vendor specific actions */
   dissector_add_uint("wlan.action.vendor_specific", OUI_MARVELL, create_dissector_handle(dissect_vendor_action_marvell, -1));

@@ -622,12 +622,18 @@ static int hf_gtpv2_node_name = -1;
 static int hf_gtpv2_length_of_node_realm = -1;
 static int hf_gtpv2_node_realm = -1;
 static int hf_gtpv2_ms_ts = -1;
+static int hf_gtpv2_origination_ts = -1;
 static int hf_gtpv2_mon_event_inf_nsur = -1;
 static int hf_gtpv2_mon_event_inf_nsui = -1;
 static int hf_gtpv2_mon_event_inf_scef_reference_id = -1;
 static int hf_gtpv2_mon_event_inf_scef_id_length = -1;
 static int hf_gtpv2_mon_event_inf_scef_id = -1;
 static int hf_gtpv2_mon_event_inf_remaining_number_of_reports = -1;
+static int hf_gtpv2_mon_event_ext_inf_lrtp = -1;
+static int hf_gtpv2_mon_event_ext_inf_scef_reference_id = -1;
+static int hf_gtpv2_mon_event_ext_inf_scef_id_length = -1;
+static int hf_gtpv2_mon_event_ext_inf_scef_id = -1;
+static int hf_gtpv2_mon_event_ext_inf_remain_min_period_loc_report_type = -1;
 static int hf_gtpv2_rohc_profiles_bit0 = -1;
 static int hf_gtpv2_rohc_profiles_bit1 = -1;
 static int hf_gtpv2_rohc_profiles_bit2 = -1;
@@ -3032,22 +3038,9 @@ dissect_gtpv2_uli(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, proto_ite
 
 /* Diameter 3GPP AVP Code: 22 3GPP-User-Location-Info */
 /*
- * TS 29.061 v9.2.0
+ * TS 29.061 v15.5.0
  * 16.4.7.2 Coding 3GPP Vendor-Specific RADIUS attributes
- *
- * For P-GW, the Geographic Location Type values and coding are defined as follows:
- *
- * 0        CGI
- * 1        SAI
- * 2        RAI
- * 3-127    Spare for future use
- * 128      TAI
- * 129      ECGI
- * 130      TAI and ECGI
- * 131-255  Spare for future use
  */
-
-
 static const value_string geographic_location_type_vals[] = {
     {0,   "CGI"},
     {1,   "SAI"},
@@ -3060,7 +3053,11 @@ static const value_string geographic_location_type_vals[] = {
     {133, "extended eNodeB ID"},
     {134, "TAI and extended eNodeB ID"},
     {135, "NCGI"},
-    {136, "TAI and NCGI"},
+    {136, "5GS TAI"},
+    {137, "5GS TAI and NCGI"},
+    {138, "NG-RAN Node ID"},
+    {139, "5GS TAI and NG-RAN Node ID"},
+    /* 140-255	Spare for future use */
     {0, NULL}
 };
 
@@ -3137,7 +3134,17 @@ dissect_diameter_3gpp_uli(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, v
         }
         return length;
     case 136:
-        /* TAI and NCGI */
+        /* 5GS TAI */
+        {
+            proto_tree *subtree;
+
+            subtree = proto_tree_add_subtree(tree, tvb, offset, 5, ett_gtpv2_uli_field, NULL,
+                                             "Tracking Area Identity (TAI)");
+            diam_sub_dis->avp_str = dissect_gtpv2_tai(tvb, pinfo, subtree, &offset);
+        }
+        return length;
+    case 137:
+        /* 5GS TAI and NCGI */
         {
             gchar *mcc_mnc_str;
             guint64 nr_cell_id;
@@ -7353,7 +7360,7 @@ dissect_gtpv2_integer_number(tvbuff_t *tvb, packet_info *pinfo _U_, proto_tree *
  */
 
 static void
-dissect_gtpv2_ms_ts(tvbuff_t *tvb, packet_info *pinfo _U_, proto_tree *tree, proto_item *item _U_, guint16 length _U_, guint8 message_type _U_, guint8 instance _U_, session_args_t * args _U_)
+dissect_gtpv2_ms_ts(tvbuff_t *tvb, packet_info *pinfo _U_, proto_tree *tree, proto_item *item _U_, guint16 length _U_, guint8 message_type, guint8 instance _U_, session_args_t * args _U_)
 {
     int offset = 0;
     /* Octets 5 to 10 represent a 48 bit unsigned integer in network order format and are encoded as
@@ -7361,7 +7368,15 @@ dissect_gtpv2_ms_ts(tvbuff_t *tvb, packet_info *pinfo _U_, proto_tree *tree, pro
      * rounded value of 1000 x the value of the 64-bit timestamp (Seconds  + (Fraction / (1<<32)))
      * defined in section 6 of IETF RFC 5905
      */
-    proto_tree_add_item(tree, hf_gtpv2_ms_ts, tvb, offset, 6, ENC_TIME_MSEC_NTP | ENC_BIG_ENDIAN);
+    switch (message_type) {
+    case GTPV2_CREATE_SESSION_REQUEST:
+        /*proto_item_append_text(item, "Origination time stamp");*/
+        proto_tree_add_item(tree, hf_gtpv2_origination_ts, tvb, offset, length, ENC_TIME_MSEC_NTP | ENC_BIG_ENDIAN);
+        break;
+    default:
+        proto_tree_add_item(tree, hf_gtpv2_ms_ts, tvb, offset, 6, ENC_TIME_MSEC_NTP | ENC_BIG_ENDIAN);
+        break;
+    }
 }
 
 /*
@@ -7981,7 +7996,31 @@ dissect_gtpv2_ext_trs_inf(tvbuff_t* tvb, packet_info* pinfo _U_, proto_tree* tre
 static void
 dissect_gtpv2_ie_mon_event_ext_inf(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree, proto_item* item _U_, guint16 length, guint8 message_type _U_, guint8 instance _U_, session_args_t* args _U_)
 {
-    proto_tree_add_expert(tree, pinfo, &ei_gtpv2_ie_data_not_dissected, tvb, 0, length);
+    int   offset = 0;
+    gboolean lrtp;
+    guint32 scef_id_len;
+
+    /* Octet 5 Bit 1 LRTP Bit 2-8 Spare */
+    proto_tree_add_bits_item(tree, hf_gtpv2_spare_bits, tvb, offset, 7, ENC_BIG_ENDIAN);
+    proto_tree_add_item_ret_boolean(tree, hf_gtpv2_mon_event_ext_inf_lrtp, tvb, offset, 1, ENC_BIG_ENDIAN, &lrtp);
+    offset++;
+    /* Octet 6 to 9 SCEF Reference ID */
+    proto_tree_add_item(tree, hf_gtpv2_mon_event_ext_inf_scef_reference_id, tvb, offset, 4, ENC_BIG_ENDIAN);
+    offset += 4;
+    /* Octet 10 Length of SCEF ID */
+    proto_tree_add_item_ret_uint(tree, hf_gtpv2_mon_event_ext_inf_scef_id_length, tvb, offset, 1, ENC_BIG_ENDIAN, &scef_id_len);
+    offset++;
+    /* Octet 11 to k SCEF ID */
+    proto_tree_add_item(tree, hf_gtpv2_mon_event_ext_inf_scef_id, tvb, offset, scef_id_len, ENC_UTF_8 | ENC_NA);
+    offset = offset + scef_id_len;
+    if (lrtp) {
+        proto_tree_add_item(tree, hf_gtpv2_mon_event_ext_inf_remain_min_period_loc_report_type, tvb, offset, 4, ENC_BIG_ENDIAN);
+        offset += 4;
+    }
+
+    if(offset < length){
+        proto_tree_add_expert(tree, pinfo, &ei_gtpv2_ie_data_not_dissected, tvb, offset, length- offset);
+    }
 }
 
 
@@ -8428,13 +8467,15 @@ dissect_gtpv2_ie_common(tvbuff_t * tvb, packet_info * pinfo, proto_tree * tree, 
         proto_tree_add_item(ie_tree, hf_gtpv2_ie_len, tvb, offset, 2, ENC_BIG_ENDIAN);
         offset += 2;
 
-        /* CR Spare Instance Octet 4*/
-        proto_tree_add_item(ie_tree, hf_gtpv2_cr, tvb, offset, 1, ENC_BIG_ENDIAN);
 
         /* ch8.120 breaks the format described in ch8.2.1 */
         if (type == GTPV2_IE_MON_EVENT_INF) {
+            proto_tree_add_bits_item(ie_tree, hf_gtpv2_spare_bits, tvb, offset << 3, 2, ENC_BIG_ENDIAN);
             proto_tree_add_item(ie_tree, hf_gtpv2_mon_event_inf_nsui, tvb, offset, 1, ENC_BIG_ENDIAN);
             proto_tree_add_item(ie_tree, hf_gtpv2_mon_event_inf_nsur, tvb, offset, 1, ENC_BIG_ENDIAN);
+        } else {
+            /* CR Spare Instance Octet 4*/
+            proto_tree_add_item(ie_tree, hf_gtpv2_cr, tvb, offset, 1, ENC_BIG_ENDIAN);
         }
 
         instance = tvb_get_guint8(tvb, offset) & 0x0f;
@@ -8728,7 +8769,7 @@ void proto_register_gtpv2(void)
         },
         { &hf_gtpv2_seq,
           {"Sequence Number", "gtpv2.seq",
-           FT_UINT32, BASE_HEX_DEC, NULL, 0x0,
+           FT_UINT24, BASE_HEX_DEC, NULL, 0x0,
            "SEQ", HFILL}
         },
         { &hf_gtpv2_msg_prio,
@@ -11033,6 +11074,11 @@ void proto_register_gtpv2(void)
           FT_ABSOLUTE_TIME, ABSOLUTE_TIME_UTC, NULL, 0x0,
           NULL, HFILL }
       },
+      { &hf_gtpv2_origination_ts,
+      { "Origination Time Stamp", "gtpv2.ms_ts",
+          FT_ABSOLUTE_TIME, ABSOLUTE_TIME_UTC, NULL, 0x0,
+          NULL, HFILL }
+      },
       { &hf_gtpv2_mon_event_inf_nsur,
       { "NSUR (Notify SCEF when UE becomes Reachable)", "gtpv2.mon_event_inf.nsur",
           FT_BOOLEAN, 8, TFS(&tfs_present_not_present), 0x10,
@@ -11061,6 +11107,31 @@ void proto_register_gtpv2(void)
       { &hf_gtpv2_mon_event_inf_remaining_number_of_reports,
           { "Remaining Number of Reports", "gtpv2.mon_event_inf.remaining_number_of_reports",
           FT_UINT16, BASE_DEC, NULL, 0x0,
+          NULL, HFILL }
+      },
+      { &hf_gtpv2_mon_event_ext_inf_lrtp,
+      { "LRTP (Remaining Minimum Periodic Location Reporting Time Present)", "gtpv2.mon_event_ext_inf.lrtp",
+          FT_BOOLEAN, 8, TFS(&tfs_present_not_present), 0x01,
+          NULL, HFILL }
+      },
+      { &hf_gtpv2_mon_event_ext_inf_scef_reference_id,
+          { "SCEF Reference ID", "gtpv2.mon_event_ext_inf.scef_reference_id",
+          FT_UINT32, BASE_DEC, NULL, 0x0,
+          NULL, HFILL }
+      },
+      { &hf_gtpv2_mon_event_ext_inf_scef_id_length,
+          { "SCEF ID length", "gtpv2.mon_event_ext_inf.scef_id_length",
+          FT_UINT8, BASE_DEC, NULL, 0x0,
+          NULL, HFILL }
+      },
+      { &hf_gtpv2_mon_event_ext_inf_scef_id,
+          { "SCEF ID", "gtpv2.mon_event_ext_inf.scef_id",
+          FT_STRING, BASE_NONE, NULL, 0x0,
+          NULL, HFILL }
+      },
+      { &hf_gtpv2_mon_event_ext_inf_remain_min_period_loc_report_type,
+          { "Remaining Minimum Periodic Location Reporting Time", "gtpv2.mon_event_ext_inf.remain_min_period_loc_report_type",
+          FT_UINT32, BASE_DEC|BASE_UNIT_STRING, &units_seconds, 0x0,
           NULL, HFILL }
       },
       { &hf_gtpv2_rohc_profile_flags,
